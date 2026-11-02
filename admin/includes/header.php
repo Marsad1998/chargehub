@@ -113,6 +113,10 @@ if (!str_ends_with($admin_base_url, '/admin/')) {
             border-color: #2563eb;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
         }
+        select.input-app, select.input-app option, select option {
+            background-color: var(--app-input-bg);
+            color: var(--app-text-title);
+        }
 
         /* High contrast light mode helper overrides */
         html.theme-light .bg-slate-500\/10 {

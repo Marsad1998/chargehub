@@ -249,12 +249,12 @@ try {
                 <!-- Search Box -->
                 <div class="relative lg:col-span-2">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-app-muted">🔍</span>
-                    <input type="text" name="search" value="<?= e($search) ?>" placeholder="Search by Order #, Customer Name, Phone, Address..." class="w-full pl-8 pr-3 py-2 rounded-xl bg-slate-900/10 dark:bg-slate-900 border border-app text-app-title text-xs placeholder-app-muted focus:outline-none focus:border-blue-500">
+                    <input type="text" name="search" value="<?= e($search) ?>" placeholder="Search by Order #, Customer Name, Phone, Address..." class="w-full pl-8 pr-3 py-2 rounded-xl input-app border border-app text-app-title text-xs placeholder:text-app-muted focus:outline-none focus:border-blue-500 transition-all">
                 </div>
 
                 <!-- Status Filter -->
                 <div>
-                    <select name="status" class="w-full px-3 py-2 rounded-xl bg-slate-900/10 dark:bg-slate-900 border border-app text-app-title text-xs font-medium focus:outline-none focus:border-blue-500 cursor-pointer">
+                    <select name="status" class="w-full px-3 py-2 rounded-xl input-app border border-app text-app-title text-xs font-semibold focus:outline-none focus:border-blue-500 cursor-pointer transition-all">
                         <option value="">All Statuses (<?= $totalOrders ?>)</option>
                         <option value="Pending" <?= $filter_status === 'Pending' ? 'selected' : '' ?>>Pending (<?= $pendingOrders ?>)</option>
                         <option value="Confirmed" <?= $filter_status === 'Confirmed' ? 'selected' : '' ?>>Confirmed (<?= $confirmedOrders ?>)</option>
@@ -266,7 +266,7 @@ try {
 
                 <!-- City Filter -->
                 <div>
-                    <select name="city" class="w-full px-3 py-2 rounded-xl bg-slate-900/10 dark:bg-slate-900 border border-app text-app-title text-xs font-medium focus:outline-none focus:border-blue-500 cursor-pointer">
+                    <select name="city" class="w-full px-3 py-2 rounded-xl input-app border border-app text-app-title text-xs font-semibold focus:outline-none focus:border-blue-500 cursor-pointer transition-all">
                         <option value="">All Cities</option>
                         <?php foreach ($cities as $c): ?>
                         <option value="<?= e($c) ?>" <?= $filter_city === $c ? 'selected' : '' ?>><?= e($c) ?></option>
@@ -302,7 +302,7 @@ try {
                         <span>Selected <span id="selected-count">0</span> orders:</span>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <select name="bulk_status" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-blue-500/40 text-white text-xs">
+                        <select name="bulk_status" class="px-3 py-1.5 rounded-lg input-app border border-blue-500/40 text-app-title text-xs font-semibold cursor-pointer">
                             <option value="Confirmed">Mark as Confirmed</option>
                             <option value="Dispatched">Mark as Dispatched</option>
                             <option value="Delivered">Mark as Delivered</option>
@@ -479,7 +479,7 @@ try {
         <div class="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1 text-xs">
             
             <!-- Customer & Shipping Card -->
-            <div class="p-4 rounded-2xl bg-slate-900/10 dark:bg-slate-900 border border-app grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="p-4 rounded-2xl bg-slate-500/10 border border-app grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <span class="text-[10px] font-bold text-app-muted uppercase tracking-wider block mb-1">Customer Details</span>
                     <div id="modal-cust-name" class="font-bold text-sm text-app-title">Customer Name</div>
@@ -558,7 +558,7 @@ try {
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-[11px] text-app-muted mb-1 font-semibold">New Status:</label>
-                        <select name="status" id="modal-status-select" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-blue-500/30 text-white text-xs font-semibold focus:outline-none focus:border-blue-400 cursor-pointer">
+                        <select name="status" id="modal-status-select" class="w-full px-3 py-2 rounded-xl input-app border border-app text-app-title text-xs font-semibold focus:outline-none focus:border-blue-500 cursor-pointer">
                             <option value="Pending">⏳ Pending (New Order)</option>
                             <option value="Confirmed">📋 Confirmed (Packed &amp; Verified)</option>
                             <option value="Dispatched">🚚 Dispatched (In Transit with Courier)</option>
@@ -569,7 +569,7 @@ try {
 
                     <div>
                         <label class="block text-[11px] text-app-muted mb-1 font-semibold">Courier Tracking / Notes:</label>
-                        <input type="text" name="notes" id="modal-notes-input" placeholder="e.g. Trax Tracking # 7492819" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-blue-500/30 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-blue-400">
+                        <input type="text" name="notes" id="modal-notes-input" placeholder="e.g. Trax Tracking # 7492819" class="w-full px-3 py-2 rounded-xl input-app border border-app text-app-title text-xs placeholder:text-app-muted focus:outline-none focus:border-blue-500">
                     </div>
                 </div>
 
