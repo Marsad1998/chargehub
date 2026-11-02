@@ -1,0 +1,14 @@
+# ChargeHub.pk - v7 Apache Configuration
+# Enforce PHP execution as default directory index
+DirectoryIndex index.php index.html
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+
+# Redirect legacy .html requests directly to their .php equivalents
+RewriteRule ^index\.html$ index.php [R=301,L]
+RewriteRule ^explore\.html$ explore.php [R=301,L]
+RewriteRule ^product-detail\.html$ product-detail.php [R=301,L]
+RewriteRule ^(.*)\.html$ $1.php [R=301,L]
+</IfModule>

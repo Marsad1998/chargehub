@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="520" viewBox="0 0 300 520" fill="none">
+<path d="M 32 0 
+         H 268 
+         Q 300 0 300 32 
+         V 150 
+         C 300 185 260 195 260 230 
+         V 320 
+         C 260 355 300 365 300 400 
+         V 488 
+         Q 300 520 268 520 
+         H 32 
+         Q 0 520 0 488 
+         V 32 
+         Q 0 0 32 0 Z" 
+      fill="white" 
+      stroke="#e5e7eb" 
+      stroke-width="1.5" />
+</svg>
