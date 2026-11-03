@@ -268,10 +268,13 @@ if ($maxSliderVal <= $minSliderVal) $maxSliderVal = $minSliderVal + 10000;
 </head>
 <body class="selection:bg-brand-blue selection:text-white relative min-h-screen flex flex-col justify-between overflow-x-hidden">
 
+    <!-- GLOBAL STICKY MOBILE & TABLET TOP BAR -->
+    <?php require_once __DIR__ . '/includes/mobile_topbar.php'; ?>
+
     <!-- ================================================================= -->
-    <!-- FLOATING STICKY CAPSULE NAVBAR (Active on Scroll, Exact Reference) -->
+    <!-- FLOATING STICKY CAPSULE NAVBAR (Active on Scroll, Desktop Screens) -->
     <!-- ================================================================= -->
-    <nav id="sticky-navbar" class="fixed top-2.5 sm:top-3.5 left-1/2 -translate-x-1/2 w-[95%] max-w-[1360px] z-50 transition-all duration-300 transform -translate-y-24 opacity-0 pointer-events-none">
+    <nav id="sticky-navbar" class="fixed top-2.5 sm:top-3.5 left-1/2 -translate-x-1/2 w-[95%] max-w-[1360px] z-50 transition-all duration-300 transform -translate-y-24 opacity-0 pointer-events-none hidden lg:block">
         <div class="w-full bg-white/95 backdrop-blur-md rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-200/90 px-3.5 sm:px-6 lg:px-8 h-[48px] sm:h-[52px] flex items-center justify-between">
             <!-- Logo -->
             <a href="index.php" class="flex items-center space-x-2 group flex-shrink-0" title="ChargeHub.pk - Genuine Chargers, Genuine Cables">
@@ -317,11 +320,11 @@ if ($maxSliderVal <= $minSliderVal) $maxSliderVal = $minSliderVal + 10000;
     <!-- ================================================================= -->
     <!-- TOP HERO BANNER WITH THE SIGNATURE CURVED SCOOP NAVBAR -->
     <!-- ================================================================= -->
-    <section class="w-full px-1.5 sm:px-2 md:px-2.5 pt-0.5 sm:pt-1 pb-2">
+    <section class="w-full px-1.5 sm:px-2 md:px-2.5 pt-15 sm:pt-16 lg:pt-1 pb-2">
         <div class="relative w-full rounded-[18px] sm:rounded-[24px] md:rounded-[30px] overflow-hidden shadow-2xl bg-gradient-to-r from-[#070b19] via-[#001f5c] to-[#070b19] pt-2 pb-8 sm:pb-10 px-4 sm:px-8 border border-blue-900/40">
             
-            <!-- THE CURVED NAV NOTCH / SCOOP HEADER (THE EXACT SIGNATURE COMPONENT) -->
-            <header class="relative w-full h-[52px] sm:h-[58px] flex items-start justify-between z-40 mb-4 pointer-events-none">
+            <!-- THE CURVED NAV NOTCH / SCOOP HEADER (THE EXACT SIGNATURE COMPONENT - DESKTOP) -->
+            <header class="relative w-full h-[52px] sm:h-[58px] flex items-start justify-between z-40 mb-4 pointer-events-none hidden lg:flex">
                 
                 <!-- LEFT WING: CHARGEHUB LOGO -->
                 <div class="pointer-events-auto flex items-center pt-2 sm:pt-2.5 z-50">

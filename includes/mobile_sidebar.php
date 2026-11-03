@@ -1,7 +1,7 @@
 <?php
 /**
  * ChargeHub.pk - Global Off-Canvas Mobile & Tablet Sidebar Navigation
- * Transforms the top navigation bar into a sleek, responsive side navigation on mobile and tablet devices.
+ * Minimal White Design with Theme Color Contrast (Apple/Anker style)
  * Included globally across storefront pages: index.php, explore.php, product-detail.php, checkout.php
  */
 require_once __DIR__ . '/../config/db.php';
@@ -13,96 +13,96 @@ $current_page = basename($_SERVER['PHP_SELF'] ?? '');
 <!-- ================================================================= -->
 <div id="mobile-sidebar-wrapper" class="fixed inset-0 z-[9998] transition-opacity duration-300 opacity-0 pointer-events-none" aria-hidden="true">
     <!-- Backdrop Overlay (Tap to close) -->
-    <div id="mobile-sidebar-backdrop" onclick="closeMobileSidebar()" class="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity duration-300 cursor-pointer"></div>
+    <div id="mobile-sidebar-backdrop" onclick="closeMobileSidebar()" class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 cursor-pointer"></div>
 
-    <!-- Slide-Out Sidebar Panel (Left Side) -->
+    <!-- Slide-Out Sidebar Panel (Left Side) - Minimal White Design with Theme Color Contrast -->
     <aside id="mobile-sidebar-panel" 
-           class="absolute top-0 left-0 h-full w-[310px] sm:w-[350px] max-w-[85vw] bg-[#0c101d] text-white shadow-2xl flex flex-col justify-between transform -translate-x-full transition-transform duration-300 ease-out border-r border-white/10 z-[9999]"
+           class="absolute top-0 left-0 h-full w-[315px] sm:w-[350px] max-w-[85vw] bg-white text-gray-900 shadow-2xl flex flex-col justify-between transform -translate-x-full transition-transform duration-300 ease-out border-r border-gray-200/90 z-[9999]"
            role="dialog" aria-modal="true" aria-label="Mobile Navigation Menu">
         
-        <!-- TOP SECTION: HEADER & SEARCH -->
-        <div class="p-5 border-b border-white/10 bg-[#080b14] shrink-0">
-            <div class="flex items-center justify-between mb-4">
-                <!-- Brand Logo & Official Badge -->
-                <a href="index.php" onclick="closeMobileSidebar()" class="flex items-center space-x-2.5 group">
-                    <img src="images/chargehub_horizontal.png" alt="ChargeHub.pk" class="h-8 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,102,255,0.4)] transition-transform group-hover:scale-105">
+        <!-- TOP SECTION: BRAND HEADER & INSTANT SEARCH -->
+        <div class="p-5 border-b border-gray-100 bg-white shrink-0">
+            <div class="flex items-center justify-between mb-3.5">
+                <!-- Brand Logo -->
+                <a href="index.php" onclick="closeMobileSidebar()" class="flex items-center space-x-2 group">
+                    <img src="images/chargehub_horizontal.png" alt="ChargeHub.pk" class="h-8 w-auto object-contain transition-transform group-hover:scale-105">
                 </a>
                 
                 <!-- Close Button -->
                 <button type="button" 
                         onclick="closeMobileSidebar()" 
-                        class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all border border-white/15 cursor-pointer active:scale-95" 
+                        class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-900 flex items-center justify-center transition-all cursor-pointer active:scale-95" 
                         title="Close navigation menu"
                         aria-label="Close menu">
-                    <svg class="w-5 h-5 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
 
             <!-- Store Trust Pill -->
-            <div class="flex items-center space-x-2 text-[11px] text-blue-200/80 mb-3.5 bg-blue-950/60 border border-blue-800/40 px-2.5 py-1 rounded-lg">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span class="font-semibold text-white">Official Pakistan Store</span>
-                <span class="text-white/40">&bull;</span>
-                <span class="text-brand-gold font-bold">100% Genuine</span>
+            <div class="flex items-center space-x-2 text-[11px] text-blue-900 mb-3 bg-blue-50/80 border border-blue-100 px-3 py-1.5 rounded-full font-medium">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="font-bold text-gray-900">Official Pakistan Store</span>
+                <span class="text-gray-300">&bull;</span>
+                <span class="text-brand-orange font-bold">100% Genuine</span>
             </div>
 
             <!-- Instant Search Bar -->
             <form action="explore.php" method="GET" class="relative" onsubmit="closeMobileSidebar()">
                 <input type="text" 
                        name="search" 
-                       placeholder="Search chargers, cables, power banks..." 
-                       class="w-full pl-9 pr-4 py-2.5 rounded-xl bg-white/10 border border-white/15 text-xs text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-brand-blue transition-all"
+                       placeholder="Search chargers, cables, banks..." 
+                       class="w-full pl-9 pr-4 py-2 rounded-xl bg-gray-50 focus:bg-white border border-gray-200 focus:border-brand-blue focus:ring-2 focus:ring-blue-100 text-xs text-gray-900 placeholder-gray-400 focus:outline-none transition-all"
                        autocomplete="off">
-                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-3 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
             </form>
         </div>
 
         <!-- MIDDLE SECTION: SCROLLABLE NAVIGATION LINKS & SHORTCUTS -->
-        <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5 divide-y divide-white/5 scrollbar-thin scrollbar-thumb-white/10">
+        <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5 divide-y divide-gray-100 scrollbar-thin">
             
             <!-- MAIN NAVIGATION LIST -->
             <nav class="space-y-1">
-                <p class="text-[10px] font-black tracking-widest uppercase text-gray-400 mb-2 px-3">
+                <p class="text-[10.5px] font-bold tracking-wider uppercase text-gray-400 mb-2 px-3">
                     Menu Navigation
                 </p>
 
                 <!-- Home -->
                 <a href="index.php" onclick="closeMobileSidebar()" 
-                   class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all <?= ($current_page === 'index.php' || $current_page === '') ? 'bg-brand-blue text-white shadow-md shadow-blue-500/30' : 'text-gray-200 hover:bg-white/10 hover:text-white' ?>">
+                   class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all <?= ($current_page === 'index.php' || $current_page === '') ? 'bg-brand-blue text-white shadow-md shadow-blue-500/25' : 'text-gray-700 hover:bg-blue-50/80 hover:text-brand-blue' ?>">
                     <span class="flex items-center space-x-3">
                         <span class="text-base">🏠</span>
                         <span>Home</span>
                     </span>
-                    <span class="text-[10px] text-white/60">Explore</span>
+                    <span class="text-[10px] <?= ($current_page === 'index.php' || $current_page === '') ? 'text-white/80' : 'text-gray-400' ?>">Storefront</span>
                 </a>
 
                 <!-- Product Catalog -->
                 <a href="explore.php" onclick="closeMobileSidebar()" 
-                   class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all <?= ($current_page === 'explore.php') ? 'bg-brand-blue text-white shadow-md shadow-blue-500/30' : 'text-gray-200 hover:bg-white/10 hover:text-white' ?>">
+                   class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all <?= ($current_page === 'explore.php') ? 'bg-brand-blue text-white shadow-md shadow-blue-500/25' : 'text-gray-700 hover:bg-blue-50/80 hover:text-brand-blue' ?>">
                     <span class="flex items-center space-x-3">
                         <span class="text-base">📂</span>
                         <span>All Products Catalog</span>
                     </span>
-                    <span class="px-2 py-0.5 rounded-md bg-white/15 text-[10px] font-extrabold text-brand-gold">FULL</span>
+                    <span class="px-2 py-0.5 rounded-md <?= ($current_page === 'explore.php') ? 'bg-white/20 text-white' : 'bg-blue-50 text-brand-blue border border-blue-100' ?> text-[10px] font-extrabold">FULL</span>
                 </a>
 
                 <!-- Flagship Prime 140W -->
                 <a href="product-detail.php?slug=anker-prime-140w-gan-charger" onclick="closeMobileSidebar()" 
-                   class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all <?= ($current_page === 'product-detail.php') ? 'bg-brand-blue text-white shadow-md shadow-blue-500/30' : 'text-gray-200 hover:bg-white/10 hover:text-white' ?>">
+                   class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all <?= ($current_page === 'product-detail.php') ? 'bg-brand-blue text-white shadow-md shadow-blue-500/25' : 'text-gray-700 hover:bg-blue-50/80 hover:text-brand-blue' ?>">
                     <span class="flex items-center space-x-3">
                         <span class="text-base">⚡</span>
                         <span>Anker Prime 140W</span>
                     </span>
-                    <span class="px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-300 text-[10px] font-bold">HOT</span>
+                    <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-bold">HOT</span>
                 </a>
 
                 <!-- Fast Chargers -->
                 <a href="explore.php?category=Chargers" onclick="closeMobileSidebar()" 
-                   class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-200 hover:bg-white/10 hover:text-white transition-all">
+                   class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-gray-700 hover:bg-blue-50/80 hover:text-brand-blue transition-all">
                     <span class="flex items-center space-x-3">
                         <span class="text-base">🔌</span>
                         <span>Fast Wall Chargers</span>
@@ -112,7 +112,7 @@ $current_page = basename($_SERVER['PHP_SELF'] ?? '');
 
                 <!-- Genuine Cables -->
                 <a href="explore.php?category=Cables" onclick="closeMobileSidebar()" 
-                   class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-200 hover:bg-white/10 hover:text-white transition-all">
+                   class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-gray-700 hover:bg-blue-50/80 hover:text-brand-blue transition-all">
                     <span class="flex items-center space-x-3">
                         <span class="text-base">⚡</span>
                         <span>Genuine Kevlar Cables</span>
@@ -122,7 +122,7 @@ $current_page = basename($_SERVER['PHP_SELF'] ?? '');
 
                 <!-- Power Banks -->
                 <a href="explore.php?category=PowerBanks" onclick="closeMobileSidebar()" 
-                   class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-200 hover:bg-white/10 hover:text-white transition-all">
+                   class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-gray-700 hover:bg-blue-50/80 hover:text-brand-blue transition-all">
                     <span class="flex items-center space-x-3">
                         <span class="text-base">🔋</span>
                         <span>Power Banks &amp; Stations</span>
@@ -132,7 +132,7 @@ $current_page = basename($_SERVER['PHP_SELF'] ?? '');
 
                 <!-- 10.10 Sale Deals -->
                 <a href="index.php#sale" onclick="closeMobileSidebar()" 
-                   class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-r from-brand-orange to-red-600 text-white shadow-md shadow-orange-500/20 hover:brightness-110 transition-all mt-1">
+                   class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-r from-brand-orange to-[#ff6b00] text-white shadow-md shadow-orange-500/20 hover:brightness-105 transition-all mt-1">
                     <span class="flex items-center space-x-3">
                         <span class="text-base">🔥</span>
                         <span>10.10 Super SALE Deals</span>
@@ -143,27 +143,27 @@ $current_page = basename($_SERVER['PHP_SELF'] ?? '');
 
             <!-- POPULAR QUICK FILTERS / CATEGORIES -->
             <div class="pt-4 space-y-2">
-                <p class="text-[10px] font-black tracking-widest uppercase text-gray-400 mb-2 px-3">
+                <p class="text-[10.5px] font-bold tracking-wider uppercase text-gray-400 mb-2 px-3">
                     Quick Categories
                 </p>
                 <div class="grid grid-cols-2 gap-2 px-1">
                     <a href="explore.php?category=Chargers" onclick="closeMobileSidebar()" 
-                       class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-semibold text-gray-300 hover:text-white flex items-center space-x-2 transition-all">
+                       class="px-3 py-2 rounded-xl bg-gray-50 hover:bg-blue-50/60 border border-gray-200/70 hover:border-blue-200 text-[11px] font-semibold text-gray-700 hover:text-brand-blue flex items-center space-x-2 transition-all">
                         <span>🔌</span>
                         <span class="truncate">GaN Chargers</span>
                     </a>
                     <a href="explore.php?category=Cables" onclick="closeMobileSidebar()" 
-                       class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-semibold text-gray-300 hover:text-white flex items-center space-x-2 transition-all">
+                       class="px-3 py-2 rounded-xl bg-gray-50 hover:bg-blue-50/60 border border-gray-200/70 hover:border-blue-200 text-[11px] font-semibold text-gray-700 hover:text-brand-blue flex items-center space-x-2 transition-all">
                         <span>⚡</span>
                         <span class="truncate">Type-C Cables</span>
                     </a>
                     <a href="explore.php?category=PowerBanks" onclick="closeMobileSidebar()" 
-                       class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-semibold text-gray-300 hover:text-white flex items-center space-x-2 transition-all">
+                       class="px-3 py-2 rounded-xl bg-gray-50 hover:bg-blue-50/60 border border-gray-200/70 hover:border-blue-200 text-[11px] font-semibold text-gray-700 hover:text-brand-blue flex items-center space-x-2 transition-all">
                         <span>🧲</span>
                         <span class="truncate">MagSafe Banks</span>
                     </a>
                     <a href="explore.php?category=Hubs" onclick="closeMobileSidebar()" 
-                       class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-semibold text-gray-300 hover:text-white flex items-center space-x-2 transition-all">
+                       class="px-3 py-2 rounded-xl bg-gray-50 hover:bg-blue-50/60 border border-gray-200/70 hover:border-blue-200 text-[11px] font-semibold text-gray-700 hover:text-brand-blue flex items-center space-x-2 transition-all">
                         <span>🖥️</span>
                         <span class="truncate">USB-C Hubs</span>
                     </a>
@@ -171,17 +171,17 @@ $current_page = basename($_SERVER['PHP_SELF'] ?? '');
             </div>
 
             <!-- TRUST BADGES -->
-            <div class="pt-4 px-2 space-y-2 text-[11px] text-gray-300">
+            <div class="pt-4 px-2 space-y-2 text-[11px] text-gray-600">
                 <div class="flex items-center space-x-2.5">
-                    <span class="text-brand-gold text-base">🛡️</span>
+                    <span class="text-brand-orange text-base">🛡️</span>
                     <span><strong>100% Genuine Certified</strong> Gear</span>
                 </div>
                 <div class="flex items-center space-x-2.5">
-                    <span class="text-blue-400 text-base">🚚</span>
+                    <span class="text-brand-blue text-base">🚚</span>
                     <span><strong>Free Express Delivery</strong> over ₨3,500</span>
                 </div>
                 <div class="flex items-center space-x-2.5">
-                    <span class="text-emerald-400 text-base">🔄</span>
+                    <span class="text-emerald-600 text-base">🔄</span>
                     <span><strong>7-Day Replacement</strong> Warranty</span>
                 </div>
             </div>
@@ -189,11 +189,11 @@ $current_page = basename($_SERVER['PHP_SELF'] ?? '');
         </div>
 
         <!-- BOTTOM SECTION: CART & WHATSAPP SUPPORT HELPLINE -->
-        <div class="p-4 sm:p-5 border-t border-white/10 bg-[#080b14] space-y-2.5 shrink-0">
+        <div class="p-4 sm:p-5 border-t border-gray-100 bg-gray-50/60 space-y-2.5 shrink-0">
             <!-- View Cart Action Button -->
             <button type="button" 
                     onclick="closeMobileSidebar(); openCartDrawer();" 
-                    class="w-full py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-bold text-xs flex items-center justify-between transition-all active:scale-95 cursor-pointer">
+                    class="w-full py-2.5 px-4 rounded-xl bg-gray-900 hover:bg-black text-white font-bold text-xs flex items-center justify-between transition-all active:scale-95 cursor-pointer shadow-sm">
                 <span class="flex items-center space-x-2">
                     <svg class="w-4 h-4 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
@@ -220,7 +220,7 @@ $current_page = basename($_SERVER['PHP_SELF'] ?? '');
                     </svg>
                     <span>WhatsApp Helpline</span>
                 </span>
-                <span class="text-[10px] font-mono text-emerald-100 bg-emerald-800/60 px-1.5 py-0.5 rounded">
+                <span class="text-[10px] font-mono text-emerald-950 bg-emerald-100 font-bold px-1.5 py-0.5 rounded">
                     <?= htmlspecialchars($wa_disp, ENT_QUOTES, 'UTF-8') ?>
                 </span>
             </a>

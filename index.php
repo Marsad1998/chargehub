@@ -446,11 +446,14 @@ if (empty($categories)) {
 </head>
 <body class="selection:bg-brand-blue selection:text-white relative min-h-screen overflow-x-hidden">
 
+    <!-- GLOBAL STICKY MOBILE & TABLET TOP BAR -->
+    <?php require_once __DIR__ . '/includes/mobile_topbar.php'; ?>
+
     <!-- ================================================================= -->
-    <!-- FLOATING STICKY CAPSULE NAVBAR (Active on Scroll, Exact Reference) -->
+    <!-- FLOATING STICKY CAPSULE NAVBAR (Active on Scroll, Desktop Screens) -->
     <!-- ================================================================= -->
     <nav id="sticky-navbar" 
-         class="fixed top-2.5 sm:top-3.5 left-1/2 -translate-x-1/2 w-[95%] max-w-[1360px] z-50 transition-all duration-300 transform -translate-y-24 opacity-0 pointer-events-none">
+         class="fixed top-2.5 sm:top-3.5 left-1/2 -translate-x-1/2 w-[95%] max-w-[1360px] z-50 transition-all duration-300 transform -translate-y-24 opacity-0 pointer-events-none hidden lg:block">
         <div class="w-full bg-white/95 backdrop-blur-md rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-200/90 px-3.5 sm:px-6 lg:px-8 h-[48px] sm:h-[52px] flex items-center justify-between">
             
             <!-- LEFT WING: CHARGEHUB LOGO -->
@@ -504,13 +507,13 @@ if (empty($categories)) {
     <!-- ================================================================= -->
     <!-- FULL WIDTH HERO SECTION (Edge-to-Edge Full Screen Width) -->
     <!-- ================================================================= -->
-    <section class="w-full px-1.5 sm:px-2 md:px-2.5 pt-0.5 sm:pt-1 pb-2">
+    <section class="w-full px-1.5 sm:px-2 md:px-2.5 pt-15 sm:pt-16 lg:pt-1 pb-2">
         <div class="relative w-full rounded-[18px] sm:rounded-[24px] md:rounded-[30px] overflow-hidden shadow-2xl aspect-[16/7.3] sm:aspect-[16/7.2] md:aspect-[16/7.1] min-h-[460px] sm:min-h-[490px] md:min-h-[540px] lg:min-h-[580px] xl:min-h-[620px] bg-[#1a1c23]">
 
             <!-- ======================================================== -->
-            <!-- THE CURVED NAV NOTCH / SCOOP HEADER (THE SIGNATURE COMPONENT) -->
+            <!-- THE CURVED NAV NOTCH / SCOOP HEADER (THE SIGNATURE COMPONENT - DESKTOP) -->
             <!-- ======================================================== -->
-            <header class="absolute top-0 inset-x-0 z-40 pointer-events-none">
+            <header class="absolute top-0 inset-x-0 z-40 pointer-events-none hidden lg:block">
                 <div class="relative w-full h-[52px] sm:h-[58px] flex items-start justify-between px-4 sm:px-8 lg:px-10">
 
                     <!-- LEFT WING: CHARGEHUB LOGO (Overlaid on Hero Image) -->
