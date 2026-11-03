@@ -796,7 +796,8 @@ if (empty($categories)) {
         </div>
 
         <!-- DYNAMIC POP-OUT PRODUCT CARDS CAROUSEL (With Sculpted Organic S-Curve Cutout) -->
-        <div id="new-arrivals-cards-container" class="flex gap-6 sm:gap-7 overflow-x-auto scroll-smooth no-scrollbar pt-6 sm:pt-10 pb-4 snap-x snap-mandatory">
+        <div id="new-arrivals-carousel" class="relative w-full overflow-hidden select-none pt-8 sm:pt-12 pb-4 -mt-4">
+            <div id="new-arrivals-cards-container" class="flex gap-6 sm:gap-7 transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] will-change-transform cursor-grab active:cursor-grabbing">
             <?php foreach ($new_arrival_items as $arrIdx => $arr): 
                 $arrLink = !empty($arr['link_url']) ? $arr['link_url'] : 'explore.php';
                 $arrImg = !empty($arr['image_url']) ? $arr['image_url'] : 'images/1000x1000 transparent PNG/1.png';
@@ -806,7 +807,7 @@ if (empty($categories)) {
                 $arrRating = (float)($arr['rating'] ?? 0);
             ?>
             <!-- CARD <?= $arrIdx + 1 ?>: <?= htmlspecialchars($arr['title']) ?> -->
-            <div class="new-arrival-card snap-start flex-shrink-0 w-[280px] sm:w-[calc(50%-14px)] lg:w-[calc(25%-21px)] group relative flex flex-col justify-between p-5 sm:p-6 transition-all duration-300 hover:-translate-y-1 filter drop-shadow-[0_8px_25px_rgba(0,0,0,0.06)] hover:drop-shadow-[0_16px_35px_rgba(0,0,0,0.12)]">
+            <div class="new-arrival-card flex-shrink-0 w-[280px] sm:w-[calc(50%-14px)] lg:w-[calc(25%-21px)] group relative flex flex-col justify-between p-5 sm:p-6 transition-all duration-300 hover:-translate-y-1 filter drop-shadow-[0_8px_25px_rgba(0,0,0,0.06)] hover:drop-shadow-[0_16px_35px_rgba(0,0,0,0.12)]">
                 
                 <!-- SCULPTED CARD SVG BACKGROUND WITH ORGANIC S-CURVE RIGHT SCOOP -->
                 <svg class="absolute inset-0 w-full h-full -z-10 pointer-events-none" viewBox="0 0 280 440" preserveAspectRatio="none" fill="none">
@@ -901,19 +902,20 @@ if (empty($categories)) {
 
             </div>
             <?php endforeach; ?>
+            </div>
         </div>
 
         <!-- CAROUSEL PAGINATION & PROGRESS SLIDER (Interactive Exact Replica) -->
         <div class="flex items-center justify-center space-x-5 mt-10 sm:mt-12">
-            <!-- Arrows & Counter: < 1 / 9 > -->
+            <!-- Arrows & Counter: < 1 / 5 > -->
             <div class="flex items-center space-x-2 text-sm font-semibold text-gray-700 select-none">
-                <button id="new-arrivals-prev" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-200 text-gray-600 transition-colors active:scale-90" title="Previous Slide">
+                <button type="button" id="new-arrivals-prev" class="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-sm border border-gray-200/80 hover:bg-gray-100 text-gray-700 transition-all active:scale-90 cursor-pointer" title="Previous Slide">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
                     </svg>
                 </button>
-                <span id="new-arrivals-counter" class="tracking-widest text-xs font-extrabold text-gray-900 px-1">1 / <?= count($new_arrival_items) ?: 1 ?></span>
-                <button id="new-arrivals-next" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-200 text-gray-600 transition-colors active:scale-90" title="Next Slide">
+                <span id="new-arrivals-counter" class="tracking-widest text-xs font-extrabold text-gray-900 px-2 min-w-[50px] text-center">1 / <?= count($new_arrival_items) ?: 1 ?></span>
+                <button type="button" id="new-arrivals-next" class="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-sm border border-gray-200/80 hover:bg-gray-100 text-gray-700 transition-all active:scale-90 cursor-pointer" title="Next Slide">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
                     </svg>
@@ -921,8 +923,8 @@ if (empty($categories)) {
             </div>
 
             <!-- Horizontal Slider Progress Track -->
-            <div class="w-48 sm:w-64 h-2 bg-gray-200/90 rounded-full overflow-hidden relative cursor-pointer" id="new-arrivals-track">
-                <div id="new-arrivals-progress" class="h-full bg-[#111317] rounded-full transition-all duration-300" style="width: <?= count($new_arrival_items) > 0 ? max(10, round(100 / count($new_arrival_items), 1)) : 100 ?>%;"></div>
+            <div class="w-48 sm:w-64 h-2.5 bg-gray-200/90 rounded-full overflow-hidden relative cursor-pointer shadow-inner" id="new-arrivals-track">
+                <div id="new-arrivals-progress" class="h-full bg-gradient-to-r from-gray-900 to-black rounded-full transition-all duration-300 pointer-events-none" style="width: <?= count($new_arrival_items) > 0 ? max(10, round(100 / count($new_arrival_items), 1)) : 100 ?>%;"></div>
             </div>
         </div>
 
@@ -1599,8 +1601,9 @@ if (empty($categories)) {
                 }, { passive: true });
             }
 
-            // --- NEW ARRIVALS INTERACTIVE CAROUSEL PAGINATION & SLIDER ---
+            // --- NEW ARRIVALS INTERACTIVE INFINITE CAROUSEL ENGINE ---
             (function() {
+                const carousel = document.getElementById('new-arrivals-carousel');
                 const container = document.getElementById('new-arrivals-cards-container');
                 const counter = document.getElementById('new-arrivals-counter');
                 const progress = document.getElementById('new-arrivals-progress');
@@ -1610,56 +1613,220 @@ if (empty($categories)) {
 
                 if (!container) return;
 
-                const cards = container.querySelectorAll('.new-arrival-card');
-                const totalCards = cards.length;
+                const originalCards = Array.from(container.children);
+                const totalCards = originalCards.length;
                 if (totalCards === 0) return;
 
+                if (totalCards === 1) {
+                    if (counter) counter.textContent = '1 / 1';
+                    if (progress) progress.style.width = '100%';
+                    return;
+                }
+
+                // Create cloned sets before and after for seamless looping
+                const repeatSets = Math.max(2, Math.ceil(4 / totalCards));
+                const clonesBefore = [];
+                const clonesAfter = [];
+
+                for (let r = 0; r < repeatSets; r++) {
+                    originalCards.forEach((card, idx) => {
+                        const clone = card.cloneNode(true);
+                        clone.setAttribute('data-clone', 'after');
+                        clone.setAttribute('data-orig-index', idx);
+                        clonesAfter.push(clone);
+                    });
+                }
+
+                for (let r = 0; r < repeatSets; r++) {
+                    originalCards.forEach((card, idx) => {
+                        const clone = card.cloneNode(true);
+                        clone.setAttribute('data-clone', 'before');
+                        clone.setAttribute('data-orig-index', idx);
+                        clonesBefore.push(clone);
+                    });
+                }
+
+                clonesAfter.forEach(clone => container.appendChild(clone));
+                for (let i = clonesBefore.length - 1; i >= 0; i--) {
+                    container.insertBefore(clonesBefore[i], container.firstChild);
+                }
+
+                const baseOffset = clonesBefore.length;
+                let currentIndex = 0;
+
                 function getStep() {
-                    if (cards.length > 0) {
-                        return cards[0].offsetWidth + 24;
+                    const children = container.children;
+                    if (children.length >= 2) {
+                        const r0 = children[0].getBoundingClientRect();
+                        const r1 = children[1].getBoundingClientRect();
+                        const diff = r1.left - r0.left;
+                        if (diff > 0) return diff;
+                    }
+                    if (originalCards[0]) {
+                        return originalCards[0].offsetWidth + 24;
                     }
                     return 300;
                 }
 
-                function updateFromScroll() {
-                    const scrollLeft = container.scrollLeft;
-                    const maxScroll = Math.max(1, container.scrollWidth - container.clientWidth);
-                    const step = getStep();
-                    
-                    let currentIndex = Math.min(totalCards, Math.max(1, Math.round(scrollLeft / step) + 1));
-                    if (counter) counter.textContent = `${currentIndex} / ${totalCards}`;
-                    
+                function updateUI(idx) {
+                    const normalized = ((idx % totalCards) + totalCards) % totalCards;
+                    if (counter) {
+                        counter.textContent = `${normalized + 1} / ${totalCards}`;
+                    }
                     if (progress) {
-                        const ratio = Math.max(0, Math.min(1, scrollLeft / maxScroll));
-                        const minW = Math.max(10, (1 / totalCards) * 100);
-                        const currentW = minW + ratio * (100 - minW);
-                        progress.style.width = `${currentW}%`;
+                        const pct = ((normalized + 1) / totalCards) * 100;
+                        progress.style.width = `${Math.min(100, Math.max(10, pct))}%`;
                     }
                 }
 
-                container.addEventListener('scroll', updateFromScroll, { passive: true });
+                function setPosition(idx, animate = true) {
+                    const step = getStep();
+                    const targetPos = -(baseOffset + idx) * step;
+                    if (animate) {
+                        container.style.transition = 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)';
+                    } else {
+                        container.style.transition = 'none';
+                    }
+                    container.style.transform = `translateX(${targetPos}px)`;
+                    updateUI(idx);
+                }
+
+                container.addEventListener('transitionend', (e) => {
+                    if (e.target !== container) return;
+                    if (currentIndex >= totalCards || currentIndex < 0) {
+                        currentIndex = ((currentIndex % totalCards) + totalCards) % totalCards;
+                        setPosition(currentIndex, false);
+                        void container.offsetHeight;
+                    }
+                });
+
+                function nextSlide() {
+                    currentIndex++;
+                    setPosition(currentIndex, true);
+                }
+
+                function prevSlide() {
+                    currentIndex--;
+                    setPosition(currentIndex, true);
+                }
+
+                function goToIndex(idx) {
+                    currentIndex = Math.max(0, Math.min(totalCards - 1, idx));
+                    setPosition(currentIndex, true);
+                }
+
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        nextSlide();
+                    });
+                }
 
                 if (prevBtn) {
-                    prevBtn.addEventListener('click', () => {
-                        container.scrollBy({ left: -getStep(), behavior: 'smooth' });
+                    prevBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        prevSlide();
                     });
                 }
-                if (nextBtn) {
-                    nextBtn.addEventListener('click', () => {
-                        container.scrollBy({ left: getStep(), behavior: 'smooth' });
-                    });
-                }
+
                 if (track) {
                     track.addEventListener('click', (e) => {
                         const rect = track.getBoundingClientRect();
                         const clickX = e.clientX - rect.left;
-                        const ratio = Math.max(0, Math.min(1, clickX / rect.width));
-                        const maxScroll = container.scrollWidth - container.clientWidth;
-                        container.scrollTo({ left: ratio * maxScroll, behavior: 'smooth' });
+                        const ratio = Math.max(0, Math.min(0.999, clickX / rect.width));
+                        const targetIdx = Math.floor(ratio * totalCards);
+                        goToIndex(targetIdx);
                     });
                 }
 
-                updateFromScroll();
+                let resizeTimer;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimer);
+                    resizeTimer = setTimeout(() => {
+                        setPosition(currentIndex, false);
+                    }, 80);
+                });
+
+                // Touch & Mouse Dragging
+                let startX = 0;
+                let startY = 0;
+                let currentDeltaX = 0;
+                let isDragging = false;
+                let dragThresholdPassed = false;
+                const dragTarget = carousel || container;
+
+                function onPointerDown(e) {
+                    isDragging = true;
+                    dragThresholdPassed = false;
+                    currentDeltaX = 0;
+                    const pt = (e.touches && e.touches.length > 0) ? e.touches[0] : e;
+                    startX = pt.clientX;
+                    startY = pt.clientY;
+                    container.style.transition = 'none';
+                }
+
+                function onPointerMove(e) {
+                    if (!isDragging) return;
+                    const pt = (e.touches && e.touches.length > 0) ? e.touches[0] : e;
+                    const deltaX = pt.clientX - startX;
+                    const deltaY = pt.clientY - startY;
+
+                    if (e.touches && Math.abs(deltaY) > Math.abs(deltaX) && !dragThresholdPassed) {
+                        isDragging = false;
+                        setPosition(currentIndex, true);
+                        return;
+                    }
+
+                    if (Math.abs(deltaX) > 6) {
+                        dragThresholdPassed = true;
+                    }
+
+                    if (dragThresholdPassed) {
+                        if (e.cancelable && e.touches) {
+                            e.preventDefault();
+                        }
+                        currentDeltaX = deltaX;
+                        const step = getStep();
+                        const basePos = -(baseOffset + currentIndex) * step;
+                        container.style.transform = `translateX(${basePos + deltaX}px)`;
+                    }
+                }
+
+                function onPointerUp() {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    const minSwipe = 40;
+                    if (dragThresholdPassed && Math.abs(currentDeltaX) > minSwipe) {
+                        if (currentDeltaX < 0) {
+                            nextSlide();
+                        } else {
+                            prevSlide();
+                        }
+                    } else {
+                        setPosition(currentIndex, true);
+                    }
+                    setTimeout(() => {
+                        dragThresholdPassed = false;
+                    }, 50);
+                }
+
+                dragTarget.addEventListener('click', (e) => {
+                    if (dragThresholdPassed) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }, true);
+
+                dragTarget.addEventListener('mousedown', onPointerDown);
+                window.addEventListener('mousemove', onPointerMove);
+                window.addEventListener('mouseup', onPointerUp);
+
+                dragTarget.addEventListener('touchstart', onPointerDown, { passive: true });
+                window.addEventListener('touchmove', onPointerMove, { passive: false });
+                window.addEventListener('touchend', onPointerUp, { passive: true });
+
+                // Initialize first position cleanly
+                setPosition(0, false);
             })();
 
             // Initialize on page load (starts with Jamster in center matching screenshot)

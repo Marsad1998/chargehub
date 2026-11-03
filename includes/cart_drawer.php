@@ -461,64 +461,64 @@ require_once __DIR__ . '/mobile_sidebar.php';
             });
         });
 
-        // 2. Attach global Add to Cart handler to all .add-cart-btn buttons
-        document.querySelectorAll('.add-cart-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                // If it's on product-detail page and has specific action ID, skip generic handler
-                if (btn.id === 'add-to-cart-action' || btn.id === 'buy-now-action') {
-                    return;
+        // 2. Attach global Add to Cart handler via event delegation (supports cloned cards)
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.add-cart-btn');
+            if (!btn) return;
+            // If it's on product-detail page and has specific action ID, skip generic handler
+            if (btn.id === 'add-to-cart-action' || btn.id === 'buy-now-action') {
+                return;
+            }
+
+            e.preventDefault();
+            const card = btn.closest('.catalog-card') || btn.closest('.new-arrival-card') || btn.closest('.group') || btn.parentElement;
+            
+            let name = btn.dataset.product || '';
+            if (!name && card) {
+                const hTitle = card.querySelector('h3, h2, h4, .brand-font');
+                if (hTitle) name = hTitle.textContent.trim();
+            }
+            if (!name) name = 'Product';
+
+            let slug = btn.dataset.slug || '';
+            if (!slug && card) {
+                const link = card.querySelector('a[href*="slug="]');
+                if (link) {
+                    try {
+                        const u = new URL(link.href, window.location.origin);
+                        slug = u.searchParams.get('slug') || '';
+                    } catch(err) {}
                 }
+            }
 
-                e.preventDefault();
-                const card = btn.closest('.catalog-card') || btn.closest('.group') || btn.parentElement;
-                
-                let name = btn.dataset.product || '';
-                if (!name && card) {
-                    const hTitle = card.querySelector('h3, h2, h4, .brand-font');
-                    if (hTitle) name = hTitle.textContent.trim();
+            let price = parseFloat(btn.dataset.price) || 0;
+            if (!price && card) {
+                const pEl = card.querySelector('.font-extrabold, .font-black');
+                if (pEl) {
+                    price = parseFloat(pEl.textContent.replace(/[^0-9.]/g, '')) || 0;
                 }
-                if (!name) name = 'Product';
+            }
 
-                let slug = btn.dataset.slug || '';
-                if (!slug && card) {
-                    const link = card.querySelector('a[href*="slug="]');
-                    if (link) {
-                        try {
-                            const u = new URL(link.href, window.location.origin);
-                            slug = u.searchParams.get('slug') || '';
-                        } catch(e) {}
-                    }
-                }
+            let image = btn.dataset.image || '';
+            if (!image && card) {
+                const img = card.querySelector('img');
+                if (img && img.src) image = img.src;
+            }
 
-                let price = parseFloat(btn.dataset.price) || 0;
-                if (!price && card) {
-                    const pEl = card.querySelector('.font-extrabold, .font-black');
-                    if (pEl) {
-                        price = parseFloat(pEl.textContent.replace(/[^0-9.]/g, '')) || 0;
-                    }
-                }
+            addToCart({
+                name: name,
+                slug: slug,
+                price: price,
+                main_image: image || 'images/Hero Banner.jpg'
+            }, 1, true);
 
-                let image = btn.dataset.image || '';
-                if (!image && card) {
-                    const img = card.querySelector('img');
-                    if (img && img.src) image = img.src;
-                }
-
-                addToCart({
-                    name: name,
-                    slug: slug,
-                    price: price,
-                    main_image: image || 'images/Hero Banner.jpg'
-                }, 1, true);
-
-                // Button visual feedback
-                const label = btn.querySelector('span') || btn;
-                const origText = label.textContent;
-                label.textContent = '✓ Added!';
-                setTimeout(() => {
-                    label.textContent = origText;
-                }, 1400);
-            });
+            // Button visual feedback
+            const label = btn.querySelector('span') || btn;
+            const origText = label.textContent;
+            label.textContent = '✓ Added!';
+            setTimeout(() => {
+                label.textContent = origText;
+            }, 1400);
         });
 
         // Close on Escape Key
