@@ -2,6 +2,8 @@
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/includes/auth.php';
 
+$waProdConfig = function_exists('get_whatsapp_config') ? get_whatsapp_config() : ['enabled' => true, 'number_clean' => '923001234567', 'number_raw' => '+92 300 1234567'];
+
 // Fetch product dynamically using prepared statement
 $product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $product_slug = isset($_GET['slug']) ? trim($_GET['slug']) : '';
@@ -199,37 +201,43 @@ $relatedProducts = $stmtRelated->fetchAll();
         }
     </style>
 </head>
-<body class="selection:bg-brand-blue selection:text-white relative min-h-screen flex flex-col justify-between">
+<body class="selection:bg-brand-blue selection:text-white relative min-h-screen flex flex-col justify-between overflow-x-hidden">
 
     <!-- ================================================================= -->
     <!-- FLOATING STICKY CAPSULE NAVBAR (Active on Scroll, Exact Reference) -->
     <!-- ================================================================= -->
     <nav id="sticky-navbar" class="fixed top-2.5 sm:top-3.5 left-1/2 -translate-x-1/2 w-[95%] max-w-[1360px] z-50 transition-all duration-300 transform -translate-y-24 opacity-0 pointer-events-none">
-        <div class="w-full bg-white/95 backdrop-blur-md rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-200/90 px-4 sm:px-6 lg:px-8 h-[48px] sm:h-[52px] flex items-center justify-between">
+        <div class="w-full bg-white/95 backdrop-blur-md rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-200/90 px-3.5 sm:px-6 lg:px-8 h-[48px] sm:h-[52px] flex items-center justify-between">
             <!-- Logo -->
             <a href="index.php" class="flex items-center space-x-2 group flex-shrink-0" title="ChargeHub.pk - Genuine Chargers, Genuine Cables">
-                <img src="images/chargehub_horizontal.png" alt="ChargeHub.pk" class="h-7 sm:h-8 w-auto object-contain transition-transform group-hover:scale-105">
+                <img src="images/chargehub_horizontal.png" alt="ChargeHub.pk" class="h-6.5 sm:h-8 w-auto object-contain transition-transform group-hover:scale-105">
             </a>
-            <!-- Links -->
-            <div class="hidden md:flex items-center space-x-4 lg:space-x-6 text-[12.5px] lg:text-[13.5px] font-semibold text-gray-800 tracking-normal">
+            <!-- Links (Visible on Laptop & Desktop screens >= 1024px) -->
+            <div class="hidden lg:flex items-center space-x-4 lg:space-x-6 text-[12.5px] lg:text-[13.5px] font-semibold text-gray-800 tracking-normal">
                 <a href="index.php" class="hover:text-brand-blue transition-colors whitespace-nowrap">Home</a>
                 <a href="explore.php" class="hover:text-brand-blue transition-colors whitespace-nowrap">Catalog</a>
                 <a href="product-detail.php" class="text-brand-blue font-bold whitespace-nowrap">Prime 140W</a>
-                <a href="index.php#charging" class="hover:text-brand-blue transition-colors whitespace-nowrap">Fast Chargers</a>
-                <a href="index.php#charging" class="hover:text-brand-blue transition-colors whitespace-nowrap">Genuine Cables</a>
-                <a href="index.php#charging" class="hover:text-brand-blue transition-colors whitespace-nowrap">Power Banks</a>
+                <a href="explore.php?category=Chargers" class="hover:text-brand-blue transition-colors whitespace-nowrap">Fast Chargers</a>
+                <a href="explore.php?category=Cables" class="hover:text-brand-blue transition-colors whitespace-nowrap">Genuine Cables</a>
+                <a href="explore.php?category=PowerBanks" class="hover:text-brand-blue transition-colors whitespace-nowrap">Power Banks</a>
                 <a href="index.php#sale" class="font-bold text-brand-orange hover:text-brand-gold flex items-center space-x-1 whitespace-nowrap transition-transform hover:scale-105">
                     <span>10.10 SALE</span>
                 </a>
             </div>
             <!-- Actions -->
-            <div class="flex items-center space-x-2.5 sm:space-x-3.5 flex-shrink-0">
+            <div class="flex items-center space-x-2 sm:space-x-3.5 flex-shrink-0">
                 <a href="explore.php" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-800 transition-all hover:scale-105" title="Search catalog">
                     <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </a>
                 <button type="button" onclick="openCartDrawer()" class="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-800 transition-all hover:scale-105 cursor-pointer" title="View Cart">
                     <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                     <span class="cart-counter-badge absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-brand-orange text-[10px] font-bold text-white flex items-center justify-center shadow-sm shadow-orange-500/30">0</span>
+                </button>
+                <!-- Mobile / Tablet Sidebar Navigation Trigger (Visible < 1024px) -->
+                <button type="button" onclick="openMobileSidebar()" class="lg:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-800 transition-all cursor-pointer active:scale-95" title="Open Navigation Menu" aria-label="Open Navigation Sidebar">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 6h16M4 12h16m-7 6h7"/>
+                    </svg>
                 </button>
             </div>
         </div>
@@ -247,12 +255,12 @@ $relatedProducts = $stmtRelated->fetchAll();
                 <!-- LEFT WING: CHARGEHUB LOGO -->
                 <div class="pointer-events-auto flex items-center pt-2 sm:pt-2.5 z-50">
                     <a href="index.php" class="flex items-center space-x-2 group" title="ChargeHub.pk - Genuine Chargers, Genuine Cables">
-                        <img src="images/chargehub_horizontal.png" alt="ChargeHub.pk" class="h-8 sm:h-9 lg:h-10 w-auto object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)] transition-transform group-hover:scale-105">
+                        <img src="images/chargehub_horizontal.png" alt="ChargeHub.pk" class="h-7 sm:h-9 lg:h-10 w-auto object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)] transition-transform group-hover:scale-105">
                     </a>
                 </div>
 
-                <!-- CENTRAL DIPPING TAB (Smooth Bézier S-Curves) -->
-                <div id="scoop-nav-container" class="pointer-events-auto hidden md:flex items-center absolute top-0 left-1/2 -translate-x-1/2 scoop-tab z-50 transition-all duration-700">
+                <!-- CENTRAL DIPPING TAB (Visible on Desktop >= 1024px with Bézier S-Curves) -->
+                <div id="scoop-nav-container" class="pointer-events-auto hidden lg:flex items-center absolute top-0 left-1/2 -translate-x-1/2 scoop-tab z-50 transition-all duration-700">
                     <!-- LEFT S-CURVE TRANSITION WING -->
                     <svg class="h-[42px] sm:h-[48px] lg:h-[50px] w-[58px] sm:w-[65px] lg:w-[70px] -mr-[0.5px] flex-shrink-0 pointer-events-none transition-all duration-700" viewBox="0 0 52 33" fill="none" preserveAspectRatio="none">
                         <path id="scoop-left-path" d="M0 0 H52 V33 C30 33 22 0 0 0 Z" fill="#0052cc" class="transition-colors duration-700"/>
@@ -263,8 +271,8 @@ $relatedProducts = $stmtRelated->fetchAll();
                         <a href="index.php" class="hover:text-white transition-colors whitespace-nowrap">Home</a>
                         <a href="explore.php" class="hover:text-white transition-colors whitespace-nowrap">Catalog</a>
                         <a href="product-detail.php" class="text-white font-black underline decoration-brand-orange underline-offset-4 whitespace-nowrap">Product Detail</a>
-                        <a href="index.php#charging" class="hover:text-white transition-colors whitespace-nowrap">Fast Chargers</a>
-                        <a href="index.php#charging" class="hover:text-white transition-colors whitespace-nowrap">Genuine Cables</a>
+                        <a href="explore.php?category=Chargers" class="hover:text-white transition-colors whitespace-nowrap">Fast Chargers</a>
+                        <a href="explore.php?category=Cables" class="hover:text-white transition-colors whitespace-nowrap">Genuine Cables</a>
                         <a href="index.php#sale" class="font-bold text-[#ffd700] hover:text-yellow-300 flex items-center space-x-1 whitespace-nowrap transition-transform hover:scale-105">
                             <span class="tracking-wider">SALE</span>
                         </a>
@@ -276,8 +284,8 @@ $relatedProducts = $stmtRelated->fetchAll();
                     </svg>
                 </div>
 
-                <!-- RIGHT WING: SEARCH & CART ICONS -->
-                <div class="pointer-events-auto flex items-center space-x-3 sm:space-x-4 pt-2 sm:pt-2.5 z-50">
+                <!-- RIGHT WING: SEARCH, CART & MOBILE/TABLET SIDEBAR HAMBURGER -->
+                <div class="pointer-events-auto flex items-center space-x-2.5 sm:space-x-3 pt-2 sm:pt-2.5 z-50">
                     <a href="explore.php" class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-white/80 hover:text-white transition-all hover:scale-105" title="Search catalog">
                         <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     </a>
@@ -285,20 +293,12 @@ $relatedProducts = $stmtRelated->fetchAll();
                         <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                         <span class="cart-counter-badge absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-brand-orange text-[10px] font-bold text-white flex items-center justify-center shadow-sm shadow-orange-500/30">0</span>
                     </button>
-                    <!-- Mobile Hamburger -->
-                    <button id="mobile-menu-trigger" class="md:hidden w-8 h-8 flex items-center justify-center text-white/80 hover:text-white transition-all" title="Open Navigation Menu">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+                    <!-- Mobile & Tablet Sidebar Navigation Trigger (Visible < 1024px) -->
+                    <button type="button" id="mobile-menu-trigger" onclick="openMobileSidebar()" class="lg:hidden w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-white/90 hover:text-white transition-all rounded-lg hover:bg-white/10 active:scale-95 cursor-pointer" title="Open Navigation Menu" aria-label="Open Navigation Sidebar">
+                        <svg class="w-5 h-5 sm:w-5.5 sm:h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
                     </button>
                 </div>
             </header>
-
-            <!-- MOBILE DROPDOWN MENU -->
-            <div id="mobile-menu" class="hidden md:hidden absolute top-[60px] inset-x-4 z-50 bg-[#1e2026]/95 backdrop-blur-xl rounded-2xl p-5 border border-white/20 shadow-2xl space-y-3">
-                <a href="index.php" class="block text-white font-medium hover:text-brand-gold py-1">🏠 Home</a>
-                <a href="explore.php" class="block text-white font-medium hover:text-brand-gold py-1">📂 Catalog / All Products</a>
-                <a href="index.php#charging" class="block text-white font-medium hover:text-brand-gold py-1">🔌 Fast Chargers</a>
-                <a href="index.php#charging" class="block text-white font-medium hover:text-brand-gold py-1">⚡ Genuine Cables</a>
-            </div>
 
         </div>
     </section>
@@ -437,7 +437,7 @@ $relatedProducts = $stmtRelated->fetchAll();
                             <svg class="w-4 h-4 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                             <span>Self Collection – Lahore Outlet</span>
                         </div>
-                        <a href="tel:03001234567" class="px-3.5 py-1 rounded-full border border-gray-300 hover:border-gray-400 text-gray-600 hover:text-gray-900 text-[11px] font-semibold transition-colors">
+                        <a href="tel:<?= e($waProdConfig['number_clean'] ?? '03001234567') ?>" class="px-3.5 py-1 rounded-full border border-gray-300 hover:border-gray-400 text-gray-600 hover:text-gray-900 text-[11px] font-semibold transition-colors">
                             Call Before Visiting
                         </a>
                     </div>
@@ -448,7 +448,7 @@ $relatedProducts = $stmtRelated->fetchAll();
                             <svg class="w-4 h-4 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                             <span>Need help? Ask our Experts</span>
                         </div>
-                        <a href="https://wa.me/923001234567?text=<?= urlencode('Hi ChargeHub, I need help regarding ' . $product['name']) ?>" target="_blank" rel="noopener noreferrer" class="px-3.5 py-1 rounded-full border border-emerald-500 text-emerald-600 hover:bg-emerald-50 text-[11px] font-bold transition-colors">
+                        <a href="https://wa.me/<?= e($waProdConfig['number_clean'] ?? '923001234567') ?>?text=<?= urlencode('Hi ChargeHub, I need help regarding ' . $product['name']) ?>" target="_blank" rel="noopener noreferrer" class="px-3.5 py-1 rounded-full border border-emerald-500 text-emerald-600 hover:bg-emerald-50 text-[11px] font-bold transition-colors">
                             WhatsApp
                         </a>
                     </div>
@@ -652,12 +652,25 @@ $relatedProducts = $stmtRelated->fetchAll();
         </div>
     </footer>
 
+    <!-- STICKY MOBILE BOTTOM BUY BAR (Conversion Booster for Mobile/Tablet) -->
+    <div id="mobile-sticky-buy-bar" class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-gray-200/90 px-4 py-3 z-40 flex items-center justify-between gap-3 lg:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        <div class="min-w-0">
+            <span class="text-[10px] text-gray-500 font-semibold block leading-tight">Total Price</span>
+            <span class="text-base font-black text-gray-950">Rs <?= number_format($product['price']) ?></span>
+        </div>
+        <div class="flex items-center space-x-2 shrink-0">
+            <button type="button" onclick="document.getElementById('add-to-cart-action').click();" class="px-3.5 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-gray-800 font-bold text-xs transition-all active:scale-95 cursor-pointer">
+                + Bag
+            </button>
+            <button type="button" onclick="document.getElementById('buy-now-action').click();" class="px-5 py-2.5 rounded-full bg-gradient-to-r from-brand-orange to-[#ff6b00] text-white font-extrabold text-xs shadow-md shadow-orange-500/25 active:scale-95 cursor-pointer">
+                ⚡ Buy Now
+            </button>
+        </div>
+    </div>
+
     <!-- FLOATING WHATSAPP BUTTON (Dynamic from Dashboard Setup) -->
-    <?php 
-    $waProdConfig = function_exists('get_whatsapp_config') ? get_whatsapp_config() : ['enabled' => true, 'number_clean' => '923001234567', 'number_raw' => '+92 300 1234567'];
-    if (!empty($waProdConfig['enabled'])): 
-    ?>
-    <a href="https://wa.me/<?= e($waProdConfig['number_clean']) ?>?text=<?= urlencode('Hi ChargeHub, I have a question about ' . $product['name']) ?>" target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-[#25d366] text-white rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 group" title="Chat on WhatsApp (<?= e($waProdConfig['number_raw']) ?>)">
+    <?php if (!empty($waProdConfig['enabled'])): ?>
+    <a href="https://wa.me/<?= e($waProdConfig['number_clean']) ?>?text=<?= urlencode('Hi ChargeHub, I have a question about ' . $product['name']) ?>" target="_blank" rel="noopener noreferrer" class="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-50 flex items-center justify-center w-14 h-14 bg-[#25d366] text-white rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 group" title="Chat on WhatsApp (<?= e($waProdConfig['number_raw']) ?>)">
         <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24">
             <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
         </svg>

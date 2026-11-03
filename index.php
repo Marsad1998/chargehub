@@ -444,35 +444,35 @@ if (empty($categories)) {
         }
     </style>
 </head>
-<body class="selection:bg-brand-blue selection:text-white relative min-h-screen">
+<body class="selection:bg-brand-blue selection:text-white relative min-h-screen overflow-x-hidden">
 
     <!-- ================================================================= -->
     <!-- FLOATING STICKY CAPSULE NAVBAR (Active on Scroll, Exact Reference) -->
     <!-- ================================================================= -->
     <nav id="sticky-navbar" 
          class="fixed top-2.5 sm:top-3.5 left-1/2 -translate-x-1/2 w-[95%] max-w-[1360px] z-50 transition-all duration-300 transform -translate-y-24 opacity-0 pointer-events-none">
-        <div class="w-full bg-white/95 backdrop-blur-md rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-200/90 px-4 sm:px-6 lg:px-8 h-[48px] sm:h-[52px] flex items-center justify-between">
+        <div class="w-full bg-white/95 backdrop-blur-md rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-200/90 px-3.5 sm:px-6 lg:px-8 h-[48px] sm:h-[52px] flex items-center justify-between">
             
             <!-- LEFT WING: CHARGEHUB LOGO -->
             <a href="index.php" class="flex items-center space-x-2 group flex-shrink-0" title="ChargeHub.pk - Genuine Chargers, Genuine Cables">
-                <img src="images/chargehub_horizontal.png" alt="ChargeHub.pk" class="h-7 sm:h-8 w-auto object-contain transition-transform group-hover:scale-105">
+                <img src="images/chargehub_horizontal.png" alt="ChargeHub.pk" class="h-6.5 sm:h-8 w-auto object-contain transition-transform group-hover:scale-105">
             </a>
 
-            <!-- CENTER: DESKTOP NAVIGATION LINKS -->
-            <div class="hidden md:flex items-center space-x-4 lg:space-x-6 text-[12.5px] lg:text-[13.5px] font-semibold text-gray-800 tracking-normal">
+            <!-- CENTER: DESKTOP NAVIGATION LINKS (Visible on Laptop & Desktop screens >= 1024px) -->
+            <div class="hidden lg:flex items-center space-x-4 lg:space-x-6 text-[12.5px] lg:text-[13.5px] font-semibold text-gray-800 tracking-normal">
                 <a href="index.php" class="text-brand-blue font-bold whitespace-nowrap">Home</a>
                 <a href="explore.php" class="hover:text-brand-blue transition-colors whitespace-nowrap">Catalog</a>
-                <a href="product-detail.php" class="hover:text-brand-blue transition-colors whitespace-nowrap">Prime 140W</a>
-                <a href="index.php#charging" class="hover:text-brand-blue transition-colors whitespace-nowrap">Fast Chargers</a>
-                <a href="index.php#charging" class="hover:text-brand-blue transition-colors whitespace-nowrap">Genuine Cables</a>
-                <a href="index.php#charging" class="hover:text-brand-blue transition-colors whitespace-nowrap">Power Banks</a>
+                <a href="product-detail.php?slug=anker-prime-140w-gan-charger" class="hover:text-brand-blue transition-colors whitespace-nowrap">Prime 140W</a>
+                <a href="explore.php?category=Chargers" class="hover:text-brand-blue transition-colors whitespace-nowrap">Fast Chargers</a>
+                <a href="explore.php?category=Cables" class="hover:text-brand-blue transition-colors whitespace-nowrap">Genuine Cables</a>
+                <a href="explore.php?category=PowerBanks" class="hover:text-brand-blue transition-colors whitespace-nowrap">Power Banks</a>
                 <a href="index.php#sale" class="font-bold text-brand-orange hover:text-brand-gold flex items-center space-x-1 whitespace-nowrap transition-transform hover:scale-105">
                     <span>10.10 SALE</span>
                 </a>
             </div>
 
-            <!-- RIGHT WING: SEARCH & CART ICONS (Dark / Black) -->
-            <div class="flex items-center space-x-2.5 sm:space-x-3.5 flex-shrink-0">
+            <!-- RIGHT WING: SEARCH, CART & MOBILE/TABLET SIDEBAR HAMBURGER -->
+            <div class="flex items-center space-x-2 sm:space-x-3.5 flex-shrink-0">
                 <!-- Search Button -->
                 <a href="explore.php" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-800 transition-all hover:scale-105" title="Search catalog">
                     <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -489,6 +489,13 @@ if (empty($categories)) {
                         0
                     </span>
                 </button>
+
+                <!-- Mobile / Tablet Sidebar Navigation Trigger (Visible < 1024px) -->
+                <button type="button" onclick="openMobileSidebar()" class="lg:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-800 transition-all cursor-pointer active:scale-95" title="Open Navigation Menu" aria-label="Open Navigation Sidebar">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 6h16M4 12h16m-7 6h7"/>
+                    </svg>
+                </button>
             </div>
 
         </div>
@@ -498,54 +505,54 @@ if (empty($categories)) {
     <!-- FULL WIDTH HERO SECTION (Edge-to-Edge Full Screen Width) -->
     <!-- ================================================================= -->
     <section class="w-full px-1.5 sm:px-2 md:px-2.5 pt-0.5 sm:pt-1 pb-2">
-        <div class="relative w-full rounded-[18px] sm:rounded-[24px] md:rounded-[30px] overflow-hidden shadow-2xl aspect-[16/7.3] sm:aspect-[16/7.2] md:aspect-[16/7.1] min-h-[430px] sm:min-h-[490px] md:min-h-[540px] lg:min-h-[580px] xl:min-h-[620px] bg-[#1a1c23]">
+        <div class="relative w-full rounded-[18px] sm:rounded-[24px] md:rounded-[30px] overflow-hidden shadow-2xl aspect-[16/7.3] sm:aspect-[16/7.2] md:aspect-[16/7.1] min-h-[460px] sm:min-h-[490px] md:min-h-[540px] lg:min-h-[580px] xl:min-h-[620px] bg-[#1a1c23]">
 
             <!-- ======================================================== -->
             <!-- THE CURVED NAV NOTCH / SCOOP HEADER (THE SIGNATURE COMPONENT) -->
             <!-- ======================================================== -->
             <header class="absolute top-0 inset-x-0 z-40 pointer-events-none">
-                <div class="relative w-full h-[52px] sm:h-[58px] flex items-start justify-between px-5 sm:px-8 lg:px-10">
+                <div class="relative w-full h-[52px] sm:h-[58px] flex items-start justify-between px-4 sm:px-8 lg:px-10">
 
                     <!-- LEFT WING: CHARGEHUB LOGO (Overlaid on Hero Image) -->
                     <div class="pointer-events-auto flex items-center pt-2 sm:pt-2.5 z-50">
                         <a href="index.php" class="flex items-center space-x-2 group" title="ChargeHub.pk - Genuine Chargers, Genuine Cables">
-                            <img src="images/chargehub_horizontal.png" alt="ChargeHub.pk" class="h-8 sm:h-9 lg:h-10 w-auto object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)] transition-transform group-hover:scale-105">
+                            <img src="images/chargehub_horizontal.png" alt="ChargeHub.pk" class="h-7 sm:h-9 lg:h-10 w-auto object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)] transition-transform group-hover:scale-105">
                         </a>
                     </div>
 
                     <!-- ========================================================== -->
-                    <!-- CENTRAL DIPPING TAB (1.25x Scaled Navbar Tab with Smooth Bézier S-Curves) -->
+                    <!-- CENTRAL DIPPING TAB (Visible on Desktop >= 1024px with Bézier S-Curves) -->
                     <!-- ========================================================== -->
-                    <div id="scoop-nav-container" class="pointer-events-auto hidden md:flex items-center absolute top-0 left-1/2 -translate-x-1/2 scoop-tab z-50 transition-all duration-700">
+                    <div id="scoop-nav-container" class="pointer-events-auto hidden lg:flex items-center absolute top-0 left-1/2 -translate-x-1/2 scoop-tab z-50 transition-all duration-700">
                         
-                        <!-- LEFT S-CURVE TRANSITION WING (Scaled 1.25x: 70px wide x 50px high) -->
+                        <!-- LEFT S-CURVE TRANSITION WING -->
                         <svg class="h-[42px] sm:h-[48px] lg:h-[50px] w-[58px] sm:w-[65px] lg:w-[70px] -mr-[0.5px] flex-shrink-0 pointer-events-none transition-all duration-700" 
                              viewBox="0 0 52 33" fill="none" preserveAspectRatio="none">
                             <path id="scoop-left-path" d="M0 0 H52 V33 C30 33 22 0 0 0 Z" fill="#0052cc" class="transition-colors duration-700"/>
                         </svg>
 
-                        <!-- CENTRAL NAVIGATION LINKS BODY (1.25x Scaled: Height 50px, Font 15.5px, Padded) -->
+                        <!-- CENTRAL NAVIGATION LINKS BODY -->
                         <nav id="scoop-nav-center" class="h-[42px] sm:h-[48px] lg:h-[50px] px-8 sm:px-10 lg:px-12 flex items-center space-x-6 sm:space-x-8 lg:space-x-10 text-[13.5px] sm:text-[15px] lg:text-[15.5px] font-semibold text-white/95 tracking-normal transition-colors duration-700 bg-[#0052cc]">
                             <a href="index.php" class="text-white font-black underline decoration-brand-orange underline-offset-4 whitespace-nowrap">Home</a>
                             <a href="explore.php" class="hover:text-white transition-colors whitespace-nowrap">Catalog</a>
-                            <a href="product-detail.php" class="hover:text-white transition-colors whitespace-nowrap">Prime 140W</a>
-                            <a href="index.php#charging" class="hover:text-white transition-colors whitespace-nowrap">Fast Chargers</a>
-                            <a href="index.php#charging" class="hover:text-white transition-colors whitespace-nowrap">Genuine Cables</a>
-                            <a href="index.php#charging" class="hover:text-white transition-colors whitespace-nowrap">Power Banks</a>
+                            <a href="product-detail.php?slug=anker-prime-140w-gan-charger" class="hover:text-white transition-colors whitespace-nowrap">Prime 140W</a>
+                            <a href="explore.php?category=Chargers" class="hover:text-white transition-colors whitespace-nowrap">Fast Chargers</a>
+                            <a href="explore.php?category=Cables" class="hover:text-white transition-colors whitespace-nowrap">Genuine Cables</a>
+                            <a href="explore.php?category=PowerBanks" class="hover:text-white transition-colors whitespace-nowrap">Power Banks</a>
                             <a href="index.php#sale" class="font-bold text-[#ffd700] hover:text-yellow-300 flex items-center space-x-1 whitespace-nowrap transition-transform hover:scale-105">
                                 <span class="tracking-wider">10.10 SALE</span>
                             </a>
                         </nav>
 
-                        <!-- RIGHT S-CURVE TRANSITION WING (Scaled 1.25x: 70px wide x 50px high) -->
+                        <!-- RIGHT S-CURVE TRANSITION WING -->
                         <svg class="h-[42px] sm:h-[48px] lg:h-[50px] w-[58px] sm:w-[65px] lg:w-[70px] -ml-[0.5px] flex-shrink-0 pointer-events-none transition-all duration-700" 
                              viewBox="0 0 52 33" fill="none" preserveAspectRatio="none">
                             <path id="scoop-right-path" d="M0 0 H52 C30 0 22 33 0 33 V0 Z" fill="#0052cc" class="transition-colors duration-700"/>
                         </svg>
                     </div>
 
-                    <!-- RIGHT WING: SEARCH & CART ICONS (Overlaid on Hero Image, Clean Thin Stroke) -->
-                    <div class="pointer-events-auto flex items-center space-x-3 sm:space-x-4 pt-2 sm:pt-2.5 z-50">
+                    <!-- RIGHT WING: SEARCH, CART & MOBILE/TABLET SIDEBAR HAMBURGER -->
+                    <div class="pointer-events-auto flex items-center space-x-2.5 sm:space-x-3 pt-2 sm:pt-2.5 z-50">
                         <!-- Search Button -->
                         <a href="explore.php" class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-white/80 hover:text-white transition-all hover:scale-105" title="Search catalog">
                             <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -563,29 +570,16 @@ if (empty($categories)) {
                             </span>
                         </button>
 
-                        <!-- Mobile Hamburger Button -->
-                        <button id="mobile-menu-trigger" class="md:hidden w-8 h-8 flex items-center justify-center text-white/80 hover:text-white transition-all" title="Open Navigation Menu">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
+                        <!-- Mobile & Tablet Sidebar Navigation Trigger (Visible < 1024px) -->
+                        <button type="button" id="mobile-menu-trigger" onclick="openMobileSidebar()" class="lg:hidden w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-white/90 hover:text-white transition-all rounded-lg hover:bg-white/10 active:scale-95 cursor-pointer" title="Open Navigation Menu" aria-label="Open Navigation Sidebar">
+                            <svg class="w-5 h-5 sm:w-5.5 sm:h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 6h16M4 12h16m-7 6h7"/>
                             </svg>
                         </button>
                     </div>
 
                 </div>
             </header>
-
-            <!-- ======================================================== -->
-            <!-- MOBILE DROPDOWN NAVIGATION MENU (Responsive Drawer) -->
-            <!-- ======================================================== -->
-            <div id="mobile-menu" class="hidden md:hidden absolute top-[56px] inset-x-4 z-50 bg-[#1e2026]/95 backdrop-blur-xl rounded-2xl p-5 border border-white/20 shadow-2xl space-y-3">
-                <a href="index.php" class="block text-brand-gold font-bold py-1">🏠 Home</a>
-                <a href="explore.php" class="block text-white font-medium hover:text-brand-gold py-1">📂 Catalog / All Products</a>
-                <a href="product-detail.php" class="block text-white font-medium hover:text-brand-gold py-1">⚡ Anker Prime 140W Detail</a>
-                <a href="index.php#charging" class="block text-white font-medium hover:text-brand-gold py-1">🔌 Fast Chargers</a>
-                <a href="index.php#charging" class="block text-white font-medium hover:text-brand-gold py-1">⚡ Genuine Cables</a>
-                <a href="index.php#charging" class="block text-white font-medium hover:text-brand-gold py-1">🔋 Power Banks</a>
-                <a href="index.php#sale" class="block text-brand-orange font-bold py-1">🔥 10.10 SALE Specials</a>
-            </div>
 
             <!-- ======================================================== -->
             <!-- HERO CAROUSEL: DYNAMIC CMS POWERED (SQL INJECTION SAFE) -->
@@ -715,30 +709,30 @@ if (empty($categories)) {
             </h2>
         </div>
 
-        <!-- 5 PRODUCT CARDS (MATCHING SCREENSHOT LAYOUT & STYLING) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-4.5">
+        <!-- 5 PRODUCT CARDS (RESPONSIVE 2-COL MOBILE, 3-COL TABLET, 5-COL DESKTOP) -->
+        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-4.5">
             <?php foreach ($flash_sale_items as $fItem): ?>
             <!-- Flash Sale Card -->
-            <div class="bg-white rounded-[20px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-purple-100/80 flex flex-col justify-between relative group">
+            <div class="bg-white rounded-2xl sm:rounded-[20px] overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-purple-100/80 flex flex-col justify-between relative group">
                 <!-- Top Ribbon -->
-                <div class="w-full bg-gradient-to-r from-[#0052cc] via-[#00a8ff] to-[#ff5500] h-[26px] flex items-center justify-center relative px-2">
-                    <span class="text-[10px] sm:text-[10.5px] font-medium text-white tracking-wide"><?= htmlspecialchars($fItem['ribbon_text'] ?? '10.10 sale is live') ?></span>
+                <div class="w-full bg-gradient-to-r from-[#0052cc] via-[#00a8ff] to-[#ff5500] h-[24px] sm:h-[26px] flex items-center justify-center relative px-2">
+                    <span class="text-[9px] sm:text-[10.5px] font-medium text-white tracking-wide truncate max-w-[70%] sm:max-w-none"><?= htmlspecialchars($fItem['ribbon_text'] ?? '10.10 sale is live') ?></span>
                     <!-- Discount Pill Badge -->
-                    <span class="absolute right-2 top-1.5 px-2.5 py-0.5 rounded-full bg-brand-blue text-[9.5px] font-extrabold text-white shadow-sm">
+                    <span class="absolute right-1.5 sm:right-2 top-1 sm:top-1.5 px-2 sm:px-2.5 py-0.5 rounded-full bg-brand-blue text-[8.5px] sm:text-[9.5px] font-extrabold text-white shadow-xs">
                         <?= htmlspecialchars($fItem['discount_text'] ?? 'Sale') ?>
                     </span>
                 </div>
 
-                <div class="p-3.5 sm:p-4 flex flex-col flex-1 justify-between bg-[#faf8fe]/60">
+                <div class="p-3 sm:p-4 flex flex-col flex-1 justify-between bg-[#faf8fe]/60">
                     <!-- Product Image -->
-                    <a href="<?= htmlspecialchars($fItem['link_url'] ?? 'explore.php') ?>" class="w-full h-[125px] sm:h-[135px] flex items-center justify-center mb-2 overflow-hidden block">
+                    <a href="<?= htmlspecialchars($fItem['link_url'] ?? 'explore.php') ?>" class="w-full h-[110px] sm:h-[135px] flex items-center justify-center mb-2 overflow-hidden block">
                         <img src="<?= htmlspecialchars($fItem['image_url']) ?>" alt="<?= htmlspecialchars($fItem['title']) ?>" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="this.src='images/Hero Banner.jpg'">
                     </a>
 
                     <!-- Product Details -->
                     <div>
                         <a href="<?= htmlspecialchars($fItem['link_url'] ?? 'explore.php') ?>" class="block">
-                            <h3 class="font-bold text-[12.5px] sm:text-[13px] text-gray-900 leading-snug line-clamp-1 group-hover:text-brand-blue transition-colors" title="<?= htmlspecialchars($fItem['title']) ?>">
+                            <h3 class="font-bold text-[12px] sm:text-[13px] text-gray-900 leading-snug line-clamp-1 group-hover:text-brand-blue transition-colors" title="<?= htmlspecialchars($fItem['title']) ?>">
                                 <?= htmlspecialchars($fItem['title']) ?>
                             </h3>
                         </a>
@@ -750,28 +744,28 @@ if (empty($categories)) {
                             <span class="text-amber-400 text-xs">★</span>
                             <span class="text-amber-400 text-xs">★</span>
                             <span class="text-amber-400 text-xs">★</span>
-                            <span class="text-[10px] text-gray-500 font-bold ml-1"><?= !empty($fItem['rating']) && (float)$fItem['rating'] > 0 ? number_format((float)$fItem['rating'], 1) : '5.0' ?></span>
+                            <span class="text-[9.5px] sm:text-[10px] text-gray-500 font-bold ml-1"><?= !empty($fItem['rating']) && (float)$fItem['rating'] > 0 ? number_format((float)$fItem['rating'], 1) : '5.0' ?></span>
                         </div>
 
                         <!-- Divider line -->
-                        <div class="border-t border-gray-200/60 my-2"></div>
+                        <div class="border-t border-gray-200/60 my-1.5 sm:my-2"></div>
 
                         <!-- Price -->
-                        <div class="flex items-baseline space-x-1.5">
-                            <span class="text-[13.5px] sm:text-[14px] font-extrabold text-gray-950">Rs.<?= number_format($fItem['price'], 0) ?></span>
+                        <div class="flex items-baseline space-x-1 sm:space-x-1.5 flex-wrap">
+                            <span class="text-[12.5px] sm:text-[14px] font-extrabold text-gray-950">Rs.<?= number_format($fItem['price'], 0) ?></span>
                             <?php if (!empty($fItem['original_price'])): ?>
-                                <span class="text-[10.5px] sm:text-[11px] text-gray-400 line-through">Rs.<?= number_format($fItem['original_price'], 0) ?></span>
+                                <span class="text-[9.5px] sm:text-[11px] text-gray-400 line-through">Rs.<?= number_format($fItem['original_price'], 0) ?></span>
                             <?php endif; ?>
                         </div>
 
                         <!-- Color Swatch -->
-                        <div class="mt-2 mb-3">
-                            <span class="inline-block w-3.5 h-3.5 rounded-full border-2 border-white ring-1 ring-gray-400 cursor-pointer shadow-sm" style="background-color: <?= htmlspecialchars($fItem['color_swatch'] ?? '#000000') ?>;" title="Color"></span>
+                        <div class="mt-1.5 sm:mt-2 mb-2 sm:mb-3">
+                            <span class="inline-block w-3 sm:w-3.5 h-3 sm:h-3.5 rounded-full border-2 border-white ring-1 ring-gray-400 cursor-pointer shadow-xs" style="background-color: <?= htmlspecialchars($fItem['color_swatch'] ?? '#000000') ?>;" title="Color"></span>
                         </div>
                     </div>
 
                     <!-- Buy Now Button -->
-                    <button type="button" class="w-full py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-[#0066ff] via-[#0088ff] to-[#ff5500] hover:from-[#0052cc] hover:to-[#ea580c] text-white font-bold text-[11.5px] sm:text-xs flex items-center justify-center space-x-1.5 shadow-md hover:shadow-lg transition-all active:scale-[0.98] add-cart-btn cursor-pointer" data-product="<?= htmlspecialchars($fItem['title']) ?>" data-slug="<?= htmlspecialchars($fItem['slug'] ?? slugify($fItem['title'])) ?>" data-price="<?= $fItem['price'] ?>" data-image="<?= htmlspecialchars($fItem['image_url'] ?? '') ?>">
+                    <button type="button" class="w-full py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-[#0066ff] via-[#0088ff] to-[#ff5500] hover:from-[#0052cc] hover:to-[#ea580c] text-white font-bold text-[11px] sm:text-xs flex items-center justify-center space-x-1 sm:space-x-1.5 shadow-md hover:shadow-lg transition-all active:scale-[0.98] add-cart-btn cursor-pointer" data-product="<?= htmlspecialchars($fItem['title']) ?>" data-slug="<?= htmlspecialchars($fItem['slug'] ?? slugify($fItem['title'])) ?>" data-price="<?= $fItem['price'] ?>" data-image="<?= htmlspecialchars($fItem['image_url'] ?? '') ?>">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
@@ -804,7 +798,7 @@ if (empty($categories)) {
         <!-- DYNAMIC POP-OUT PRODUCT CARDS CAROUSEL (With Sculpted Organic S-Curve Cutout) -->
         <div id="new-arrivals-cards-container" class="flex gap-6 sm:gap-7 overflow-x-auto scroll-smooth no-scrollbar pt-6 sm:pt-10 pb-4 snap-x snap-mandatory">
             <?php foreach ($new_arrival_items as $arrIdx => $arr): 
-                $arrLink = !empty($arr['link_url']) ? $arr['link_url'] : 'products.php';
+                $arrLink = !empty($arr['link_url']) ? $arr['link_url'] : 'explore.php';
                 $arrImg = !empty($arr['image_url']) ? $arr['image_url'] : 'images/1000x1000 transparent PNG/1.png';
                 $arrPrice = (float)($arr['price'] ?? 0);
                 $arrOrigPrice = (float)($arr['original_price'] ?? 0);

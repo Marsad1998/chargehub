@@ -2,6 +2,8 @@
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/includes/auth.php';
 
+$waCheckoutConfig = function_exists('get_whatsapp_config') ? get_whatsapp_config() : ['number_clean' => '923001234567', 'number_raw' => '+92 300 1234567'];
+
 // Auto-create orders table if not exists
 try {
     $pdo->exec("CREATE TABLE IF NOT EXISTS orders (
@@ -189,18 +191,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
     </style>
 </head>
-<body class="selection:bg-brand-blue selection:text-white min-h-screen flex flex-col justify-between">
+<body class="selection:bg-brand-blue selection:text-white min-h-screen flex flex-col justify-between overflow-x-hidden">
 
     <!-- TOP MINIMAL CHECKOUT HEADER -->
     <header class="bg-white border-b border-gray-200/90 sticky top-0 z-40 shadow-xs">
         <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <!-- Brand Logo -->
             <a href="index.php" class="flex items-center space-x-2 group" title="ChargeHub.pk - Genuine Chargers, Genuine Cables">
-                <img src="images/chargehub_horizontal.png" alt="ChargeHub.pk" class="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105">
+                <img src="images/chargehub_horizontal.png" alt="ChargeHub.pk" class="h-7 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105">
             </a>
 
             <!-- Checkout Steps Badge -->
-            <div class="hidden sm:flex items-center space-x-2 text-xs font-semibold">
+            <div class="hidden md:flex items-center space-x-2 text-xs font-semibold">
                 <a href="explore.php" class="text-gray-400 hover:text-gray-700">1. Cart</a>
                 <span class="text-gray-300">&rarr;</span>
                 <span class="text-brand-blue font-bold flex items-center space-x-1 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">
@@ -211,11 +213,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 <span class="text-gray-400">3. Confirmation</span>
             </div>
 
-            <!-- Security Assurance -->
-            <div class="flex items-center space-x-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
-                <span>🔒</span>
-                <span class="hidden sm:inline">256-Bit SSL Secure Checkout</span>
-                <span class="sm:hidden">Secure</span>
+            <!-- Security Assurance & Mobile Sidebar Trigger -->
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <div class="flex items-center space-x-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
+                    <span>🔒</span>
+                    <span class="hidden sm:inline">256-Bit SSL Secure</span>
+                    <span class="sm:hidden">Secure</span>
+                </div>
+                <!-- Mobile & Tablet Sidebar Navigation Trigger (Visible < 1024px) -->
+                <button type="button" onclick="openMobileSidebar()" class="lg:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-800 transition-all cursor-pointer active:scale-95" title="Open Navigation Menu" aria-label="Open Navigation Sidebar">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 6h16M4 12h16m-7 6h7"/>
+                    </svg>
+                </button>
             </div>
         </div>
     </header>
@@ -297,7 +307,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $waText = urlencode("Hi ChargeHub Pakistan! I placed Order #" . $placed_order_info['order_number'] . "\nName: " . $placed_order_info['customer_name'] . "\nPhone: " . $placed_order_info['customer_phone'] . "\nCity: " . $placed_order_info['customer_city'] . "\n\nItems:\n" . implode("\n", $waItemsMsg) . "\n\nTotal: Rs. " . number_format($placed_order_info['total_amount']) . " (Cash on Delivery)");
             ?>
             <div class="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-                <a href="https://wa.me/923001234567?text=<?= $waText ?>" target="_blank" class="px-6 py-3 rounded-full bg-[#25d366] hover:bg-[#20ba59] text-white font-bold text-xs flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition-all">
+                <a href="https://wa.me/<?= htmlspecialchars($waCheckoutConfig['number_clean']) ?>?text=<?= $waText ?>" target="_blank" class="px-6 py-3 rounded-full bg-[#25d366] hover:bg-[#20ba59] text-white font-bold text-xs flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition-all">
                     <span>💬 Receive Tracking on WhatsApp</span>
                 </a>
                 <a href="index.php" class="px-6 py-3 rounded-full bg-slate-100 hover:bg-slate-200 text-gray-800 font-bold text-xs flex items-center justify-center transition-colors">

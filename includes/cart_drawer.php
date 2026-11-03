@@ -3,6 +3,7 @@
  * ChargeHub.pk - Global Persistent Cart Sidebar Drawer Component
  * Included across storefront: index.php, explore.php, product-detail.php, checkout.php
  */
+require_once __DIR__ . '/mobile_sidebar.php';
 ?>
 <!-- ================================================================= -->
 <!-- SLIDE-OVER CART SIDEBAR DRAWER (GLOBAL) -->

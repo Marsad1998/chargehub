@@ -266,31 +266,31 @@ if ($maxSliderVal <= $minSliderVal) $maxSliderVal = $minSliderVal + 10000;
         }
     </style>
 </head>
-<body class="selection:bg-brand-blue selection:text-white relative min-h-screen flex flex-col justify-between">
+<body class="selection:bg-brand-blue selection:text-white relative min-h-screen flex flex-col justify-between overflow-x-hidden">
 
     <!-- ================================================================= -->
     <!-- FLOATING STICKY CAPSULE NAVBAR (Active on Scroll, Exact Reference) -->
     <!-- ================================================================= -->
     <nav id="sticky-navbar" class="fixed top-2.5 sm:top-3.5 left-1/2 -translate-x-1/2 w-[95%] max-w-[1360px] z-50 transition-all duration-300 transform -translate-y-24 opacity-0 pointer-events-none">
-        <div class="w-full bg-white/95 backdrop-blur-md rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-200/90 px-4 sm:px-6 lg:px-8 h-[48px] sm:h-[52px] flex items-center justify-between">
+        <div class="w-full bg-white/95 backdrop-blur-md rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-200/90 px-3.5 sm:px-6 lg:px-8 h-[48px] sm:h-[52px] flex items-center justify-between">
             <!-- Logo -->
             <a href="index.php" class="flex items-center space-x-2 group flex-shrink-0" title="ChargeHub.pk - Genuine Chargers, Genuine Cables">
-                <img src="images/chargehub_horizontal.png" alt="ChargeHub.pk" class="h-7 sm:h-8 w-auto object-contain transition-transform group-hover:scale-105">
+                <img src="images/chargehub_horizontal.png" alt="ChargeHub.pk" class="h-6.5 sm:h-8 w-auto object-contain transition-transform group-hover:scale-105">
             </a>
-            <!-- Links -->
-            <div class="hidden md:flex items-center space-x-4 lg:space-x-6 text-[12.5px] lg:text-[13.5px] font-semibold text-gray-800 tracking-normal">
+            <!-- Links (Visible on Laptop & Desktop screens >= 1024px) -->
+            <div class="hidden lg:flex items-center space-x-4 lg:space-x-6 text-[12.5px] lg:text-[13.5px] font-semibold text-gray-800 tracking-normal">
                 <a href="index.php" class="hover:text-brand-blue transition-colors whitespace-nowrap">Home</a>
                 <a href="explore.php" class="text-brand-blue font-bold whitespace-nowrap">Catalog</a>
                 <a href="product-detail.php?slug=anker-prime-140w-gan-charger" class="hover:text-brand-blue transition-colors whitespace-nowrap">Prime 140W</a>
-                <a href="index.php#charging" class="hover:text-brand-blue transition-colors whitespace-nowrap">Fast Chargers</a>
-                <a href="index.php#charging" class="hover:text-brand-blue transition-colors whitespace-nowrap">Genuine Cables</a>
-                <a href="index.php#charging" class="hover:text-brand-blue transition-colors whitespace-nowrap">Power Banks</a>
+                <a href="explore.php?category=Chargers" class="hover:text-brand-blue transition-colors whitespace-nowrap">Fast Chargers</a>
+                <a href="explore.php?category=Cables" class="hover:text-brand-blue transition-colors whitespace-nowrap">Genuine Cables</a>
+                <a href="explore.php?category=PowerBanks" class="hover:text-brand-blue transition-colors whitespace-nowrap">Power Banks</a>
                 <a href="index.php#sale" class="font-bold text-brand-orange hover:text-brand-gold flex items-center space-x-1 whitespace-nowrap transition-transform hover:scale-105">
                     <span>10.10 SALE</span>
                 </a>
             </div>
             <!-- Actions -->
-            <div class="flex items-center space-x-2.5 sm:space-x-3.5 flex-shrink-0">
+            <div class="flex items-center space-x-2 sm:space-x-3.5 flex-shrink-0">
                 <!-- Search Button -->
                 <a href="explore.php" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-800 transition-all hover:scale-105" title="Search catalog">
                     <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -302,6 +302,13 @@ if ($maxSliderVal <= $minSliderVal) $maxSliderVal = $minSliderVal + 10000;
                 <button type="button" onclick="openCartDrawer()" class="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-800 transition-all hover:scale-105 cursor-pointer" title="View Cart">
                     <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                     <span class="cart-counter-badge absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-brand-orange text-[10px] font-bold text-white flex items-center justify-center shadow-sm shadow-orange-500/30">0</span>
+                </button>
+
+                <!-- Mobile / Tablet Sidebar Navigation Trigger (Visible < 1024px) -->
+                <button type="button" onclick="openMobileSidebar()" class="lg:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-800 transition-all cursor-pointer active:scale-95" title="Open Navigation Menu" aria-label="Open Navigation Sidebar">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 6h16M4 12h16m-7 6h7"/>
+                    </svg>
                 </button>
             </div>
         </div>
@@ -319,12 +326,12 @@ if ($maxSliderVal <= $minSliderVal) $maxSliderVal = $minSliderVal + 10000;
                 <!-- LEFT WING: CHARGEHUB LOGO -->
                 <div class="pointer-events-auto flex items-center pt-2 sm:pt-2.5 z-50">
                     <a href="index.php" class="flex items-center space-x-2 group" title="ChargeHub.pk - Genuine Chargers, Genuine Cables">
-                        <img src="images/chargehub_horizontal.png" alt="ChargeHub.pk" class="h-8 sm:h-9 lg:h-10 w-auto object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)] transition-transform group-hover:scale-105">
+                        <img src="images/chargehub_horizontal.png" alt="ChargeHub.pk" class="h-7 sm:h-9 lg:h-10 w-auto object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)] transition-transform group-hover:scale-105">
                     </a>
                 </div>
 
-                <!-- CENTRAL DIPPING TAB (1.25x Scaled Navbar Tab with Smooth Bézier S-Curves) -->
-                <div id="scoop-nav-container" class="pointer-events-auto hidden md:flex items-center absolute top-0 left-1/2 -translate-x-1/2 scoop-tab z-50 transition-all duration-700">
+                <!-- CENTRAL DIPPING TAB (Visible on Desktop >= 1024px with Bézier S-Curves) -->
+                <div id="scoop-nav-container" class="pointer-events-auto hidden lg:flex items-center absolute top-0 left-1/2 -translate-x-1/2 scoop-tab z-50 transition-all duration-700">
                     <!-- LEFT S-CURVE TRANSITION WING -->
                     <svg class="h-[42px] sm:h-[48px] lg:h-[50px] w-[58px] sm:w-[65px] lg:w-[70px] -mr-[0.5px] flex-shrink-0 pointer-events-none transition-all duration-700" viewBox="0 0 52 33" fill="none" preserveAspectRatio="none">
                         <path id="scoop-left-path" d="M0 0 H52 V33 C30 33 22 0 0 0 Z" fill="#0052cc" class="transition-colors duration-700"/>
@@ -335,9 +342,9 @@ if ($maxSliderVal <= $minSliderVal) $maxSliderVal = $minSliderVal + 10000;
                         <a href="index.php" class="hover:text-white transition-colors whitespace-nowrap">Home</a>
                         <a href="explore.php" class="text-white font-black underline decoration-brand-orange underline-offset-4 whitespace-nowrap">Catalog</a>
                         <a href="product-detail.php?slug=anker-prime-140w-gan-charger" class="hover:text-white transition-colors whitespace-nowrap">Prime 140W</a>
-                        <a href="index.php#charging" class="hover:text-white transition-colors whitespace-nowrap">Fast Chargers</a>
-                        <a href="index.php#charging" class="hover:text-white transition-colors whitespace-nowrap">Genuine Cables</a>
-                        <a href="index.php#charging" class="hover:text-white transition-colors whitespace-nowrap">Power Banks</a>
+                        <a href="explore.php?category=Chargers" class="hover:text-white transition-colors whitespace-nowrap">Fast Chargers</a>
+                        <a href="explore.php?category=Cables" class="hover:text-white transition-colors whitespace-nowrap">Genuine Cables</a>
+                        <a href="explore.php?category=PowerBanks" class="hover:text-white transition-colors whitespace-nowrap">Power Banks</a>
                         <a href="index.php#sale" class="font-bold text-[#ffd700] hover:text-yellow-300 flex items-center space-x-1 whitespace-nowrap transition-transform hover:scale-105">
                             <span class="tracking-wider">10.10 SALE</span>
                         </a>
@@ -349,8 +356,8 @@ if ($maxSliderVal <= $minSliderVal) $maxSliderVal = $minSliderVal + 10000;
                     </svg>
                 </div>
 
-                <!-- RIGHT WING: SEARCH & CART ICONS -->
-                <div class="pointer-events-auto flex items-center space-x-3 sm:space-x-4 pt-2 sm:pt-2.5 z-50">
+                <!-- RIGHT WING: SEARCH, CART & MOBILE/TABLET SIDEBAR HAMBURGER -->
+                <div class="pointer-events-auto flex items-center space-x-2.5 sm:space-x-3 pt-2 sm:pt-2.5 z-50">
                     <!-- Search Link -->
                     <a href="explore.php" class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-white/80 hover:text-white transition-all hover:scale-105" title="Search catalog">
                         <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -363,23 +370,12 @@ if ($maxSliderVal <= $minSliderVal) $maxSliderVal = $minSliderVal + 10000;
                         <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                         <span class="cart-counter-badge absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-brand-orange text-[10px] font-bold text-white flex items-center justify-center shadow-sm shadow-orange-500/30">0</span>
                     </button>
-                    <!-- Mobile Hamburger -->
-                    <button id="mobile-menu-trigger" class="md:hidden w-8 h-8 flex items-center justify-center text-white/80 hover:text-white transition-all" title="Open Navigation Menu">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+                    <!-- Mobile & Tablet Sidebar Navigation Trigger (Visible < 1024px) -->
+                    <button type="button" id="mobile-menu-trigger" onclick="openMobileSidebar()" class="lg:hidden w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-white/90 hover:text-white transition-all rounded-lg hover:bg-white/10 active:scale-95 cursor-pointer" title="Open Navigation Menu" aria-label="Open Navigation Sidebar">
+                        <svg class="w-5 h-5 sm:w-5.5 sm:h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
                     </button>
                 </div>
             </header>
-
-            <!-- MOBILE DROPDOWN MENU -->
-            <div id="mobile-menu" class="hidden md:hidden absolute top-[56px] inset-x-4 z-50 bg-[#1e2026]/95 backdrop-blur-xl rounded-2xl p-5 border border-white/20 shadow-2xl space-y-3">
-                <a href="index.php" class="block text-white font-medium hover:text-brand-gold py-1">🏠 Home</a>
-                <a href="explore.php" class="block text-brand-gold font-bold py-1">📂 Catalog / All Products</a>
-                <a href="product-detail.php?slug=anker-prime-140w-gan-charger" class="block text-white font-medium hover:text-brand-gold py-1">⚡ Anker Prime 140W Detail</a>
-                <a href="index.php#charging" class="block text-white font-medium hover:text-brand-gold py-1">🔌 Fast Chargers</a>
-                <a href="index.php#charging" class="block text-white font-medium hover:text-brand-gold py-1">⚡ Genuine Cables</a>
-                <a href="index.php#charging" class="block text-white font-medium hover:text-brand-gold py-1">🔋 Power Banks</a>
-                <a href="index.php#sale" class="block text-brand-orange font-bold py-1">🔥 10.10 SALE Specials</a>
-            </div>
 
             <!-- BREADCRUMBS IN HERO -->
             <div class="max-w-7xl mx-auto pt-2 flex items-center space-x-2 text-xs text-blue-200/80">
@@ -438,16 +434,19 @@ if ($maxSliderVal <= $minSliderVal) $maxSliderVal = $minSliderVal + 10000;
             </div>
         </div>
 
+        <!-- Backdrop Overlay for Mobile/Tablet Filter Drawer -->
+        <div id="filter-drawer-backdrop" onclick="closeFilterDrawer()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9990] opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden"></div>
+
         <!-- TWO-COLUMN LAYOUT: LEFT FILTER SIDEBAR + RIGHT 3-COLUMN PRODUCT GRID -->
         <div class="flex flex-col lg:flex-row gap-8 lg:gap-10 items-start">
 
             <!-- ========================================================= -->
-            <!-- LEFT FILTER SIDEBAR: MAINTAINS CHARGEHUB DESIGN & THEME -->
+            <!-- FILTER SIDEBAR: DESKTOP STICKY ASIDE & MOBILE/TABLET SLIDE-OVER DRAWER -->
             <!-- ========================================================= -->
-            <aside id="filter-sidebar" class="hidden lg:block w-full lg:w-72 xl:w-80 shrink-0 lg:sticky lg:top-24 z-30 transition-all duration-300">
-                <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-5 sm:p-6 space-y-6">
+            <aside id="filter-sidebar" class="fixed inset-y-0 right-0 w-[310px] sm:w-[350px] max-w-[85vw] bg-white z-[9991] shadow-2xl flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-out lg:transform-none lg:static lg:block lg:w-72 xl:w-80 lg:shrink-0 lg:sticky lg:top-24 lg:z-30 lg:bg-transparent lg:shadow-none lg:h-auto">
+                <div class="bg-white rounded-none lg:rounded-2xl sm:lg:rounded-3xl border-0 lg:border border-slate-200/90 shadow-none lg:shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-5 sm:p-6 space-y-6 flex-1 overflow-y-auto">
                     
-                    <!-- SIDEBAR HEADER: FILTERS TITLE + RESET BUTTON -->
+                    <!-- SIDEBAR HEADER: FILTERS TITLE + RESET BUTTON + MOBILE CLOSE BTN -->
                     <div class="flex items-center justify-between pb-4 border-b border-slate-100">
                         <div class="flex items-center space-x-2.5">
                             <div class="w-7 h-7 rounded-lg bg-blue-50 text-brand-blue flex items-center justify-center">
@@ -457,9 +456,15 @@ if ($maxSliderVal <= $minSliderVal) $maxSliderVal = $minSliderVal + 10000;
                             </div>
                             <h3 class="text-sm font-black text-gray-900 uppercase tracking-wider">Filters</h3>
                         </div>
-                        <button type="button" id="reset-filters-btn" class="text-xs font-bold text-brand-orange hover:text-brand-gold transition-colors flex items-center space-x-1">
-                            <span>Reset All</span>
-                        </button>
+                        <div class="flex items-center space-x-2">
+                            <button type="button" id="reset-filters-btn" class="text-xs font-bold text-brand-orange hover:text-brand-gold transition-colors flex items-center space-x-1 cursor-pointer">
+                                <span>Reset All</span>
+                            </button>
+                            <!-- Mobile Close Cross Button -->
+                            <button type="button" onclick="closeFilterDrawer()" class="lg:hidden w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition-colors cursor-pointer text-lg leading-none" title="Close Filters">
+                                &times;
+                            </button>
+                        </div>
                     </div>
 
                     <!-- SEARCH WITHIN CATALOG -->
@@ -562,6 +567,16 @@ if ($maxSliderVal <= $minSliderVal) $maxSliderVal = $minSliderVal + 10000;
                         </div>
                     </div>
 
+                </div>
+
+                <!-- MOBILE STICKY APPLY BAR -->
+                <div class="lg:hidden p-3.5 bg-white border-t border-slate-100 flex items-center space-x-2.5 shrink-0 shadow-lg">
+                    <button type="button" onclick="closeFilterDrawer()" class="flex-1 py-2.5 rounded-xl bg-brand-blue hover:bg-blue-600 text-white font-bold text-xs shadow-md transition-all active:scale-95 text-center cursor-pointer">
+                        Apply Filters (<span id="mobile-filter-apply-count"><?= count($products) ?></span>)
+                    </button>
+                    <button type="button" onclick="document.getElementById('reset-filters-btn').click();" class="px-3.5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs transition-all cursor-pointer">
+                        Reset
+                    </button>
                 </div>
             </aside>
 
@@ -869,12 +884,36 @@ if ($maxSliderVal <= $minSliderVal) $maxSliderVal = $minSliderVal + 10000;
             const productGrid = document.getElementById('product-grid');
             const mobileFilterBtn = document.getElementById('mobile-filter-toggle');
             const filterSidebar = document.getElementById('filter-sidebar');
+            const filterBackdrop = document.getElementById('filter-drawer-backdrop');
+            const mobileApplyCount = document.getElementById('mobile-filter-apply-count');
 
-            // Mobile Filter Drawer Toggle
-            if (mobileFilterBtn && filterSidebar) {
-                mobileFilterBtn.addEventListener('click', () => {
-                    filterSidebar.classList.toggle('hidden');
-                });
+            function openFilterDrawer() {
+                if (!filterSidebar) return;
+                filterSidebar.classList.remove('translate-x-full');
+                filterSidebar.classList.add('translate-x-0');
+                if (filterBackdrop) {
+                    filterBackdrop.classList.remove('opacity-0', 'pointer-events-none');
+                    filterBackdrop.classList.add('opacity-100', 'pointer-events-auto');
+                }
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeFilterDrawer() {
+                if (!filterSidebar) return;
+                filterSidebar.classList.remove('translate-x-0');
+                filterSidebar.classList.add('translate-x-full');
+                if (filterBackdrop) {
+                    filterBackdrop.classList.remove('opacity-100', 'pointer-events-auto');
+                    filterBackdrop.classList.add('opacity-0', 'pointer-events-none');
+                }
+                document.body.style.overflow = '';
+            }
+
+            window.openFilterDrawer = openFilterDrawer;
+            window.closeFilterDrawer = closeFilterDrawer;
+
+            if (mobileFilterBtn) {
+                mobileFilterBtn.addEventListener('click', openFilterDrawer);
             }
 
             function applyFiltersAndSort() {
@@ -922,6 +961,9 @@ if ($maxSliderVal <= $minSliderVal) $maxSliderVal = $minSliderVal + 10000;
 
                 if (countBadge) {
                     countBadge.textContent = `${visibleCount} Product${visibleCount === 1 ? '' : 's'}`;
+                }
+                if (mobileApplyCount) {
+                    mobileApplyCount.textContent = visibleCount;
                 }
 
                 if (noProductsMsg) {
