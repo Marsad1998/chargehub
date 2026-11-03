@@ -462,6 +462,14 @@ $stmtProducts = $pdo->prepare("SELECT id, name, slug, sku, badge_text, main_imag
 $stmtProducts->execute();
 $products_list = $stmtProducts->fetchAll();
 
+// Pagination for CMS tabs
+$cms_page = max(1, (int)($_GET['page'] ?? 1));
+$cms_per_page = 10;
+$hero_slides_paged = array_slice($hero_slides, ($cms_page - 1) * $cms_per_page, $cms_per_page);
+$spotlight_items_paged = array_slice($spotlight_items, ($cms_page - 1) * $cms_per_page, $cms_per_page);
+$new_arrival_items_paged = array_slice($new_arrival_items, ($cms_page - 1) * $cms_per_page, $cms_per_page);
+$flash_sale_items_paged = array_slice($flash_sale_items, ($cms_page - 1) * $cms_per_page, $cms_per_page);
+
 ?>
 
 <!-- SIDEBAR -->
@@ -531,7 +539,7 @@ $products_list = $stmtProducts->fetchAll();
                         <h2 class="text-lg font-black text-app-title brand-font">Hero Section Banners</h2>
                         <p class="text-xs text-app-muted">Manage the flagship banners displayed at the top of the homepage</p>
                     </div>
-                    <button onclick="document.getElementById('add-hero-modal').classList.remove('hidden')" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-app-title text-xs font-bold transition-all shadow-lg shadow-blue-600/30 flex items-center space-x-1.5 self-start">
+                    <button onclick="openCmsModal('add-hero-modal')" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-app-title text-xs font-bold transition-all shadow-lg shadow-blue-600/30 flex items-center space-x-1.5 self-start">
                         <span>＋</span>
                         <span>Upload New Hero Image</span>
                     </button>
@@ -545,7 +553,7 @@ $products_list = $stmtProducts->fetchAll();
 
                 <!-- Hero Slides Table / Cards Grid -->
                 <div id="hero-cards-grid" class="grid grid-cols-1 gap-4">
-                    <?php foreach ($hero_slides as $slide): ?>
+                    <?php foreach ($hero_slides_paged as $slide): ?>
                         <div class="p-5 rounded-2xl bg-app-card border border-app flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition-all hover:border-app">
                             
                             <!-- Thumbnail & Info -->
@@ -603,6 +611,9 @@ $products_list = $stmtProducts->fetchAll();
                     <?php endforeach; ?>
                 </div>
 
+                <!-- Hero Section Pagination -->
+                <?= render_admin_pagination(count($hero_slides), $cms_per_page, $cms_page) ?>
+
             </div>
         <?php endif; ?>
 
@@ -617,7 +628,7 @@ $products_list = $stmtProducts->fetchAll();
                         <h2 class="text-lg font-black text-app-title brand-font">Product Spotlight Section Images</h2>
                         <p class="text-xs text-app-muted">Control the 1000x1000 transparent PNGs displayed in the rotating 3D spotlight carousel</p>
                     </div>
-                    <button onclick="document.getElementById('add-spotlight-modal').classList.remove('hidden')" class="px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-app-title text-xs font-bold transition-all shadow-lg shadow-orange-600/30 flex items-center space-x-1.5 self-start">
+                    <button onclick="openCmsModal('add-spotlight-modal')" class="px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-app-title text-xs font-bold transition-all shadow-lg shadow-orange-600/30 flex items-center space-x-1.5 self-start">
                         <span>＋</span>
                         <span>Upload New Spotlight Product</span>
                     </button>
@@ -631,7 +642,7 @@ $products_list = $stmtProducts->fetchAll();
 
                 <!-- Spotlight Cards Grid -->
                 <div id="spotlight-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <?php foreach ($spotlight_items as $item): ?>
+                    <?php foreach ($spotlight_items_paged as $item): ?>
                         <div class="p-5 rounded-2xl bg-app-card border border-app space-y-4 transition-all hover:border-app flex flex-col justify-between">
                             
                             <div>
@@ -682,6 +693,9 @@ $products_list = $stmtProducts->fetchAll();
                     <?php endforeach; ?>
                 </div>
 
+                <!-- Spotlight Section Pagination -->
+                <?= render_admin_pagination(count($spotlight_items), $cms_per_page, $cms_page) ?>
+
             </div>
         <?php endif; ?>
 
@@ -696,7 +710,7 @@ $products_list = $stmtProducts->fetchAll();
                         <h2 class="text-lg font-black text-app-title brand-font">New Arrivals Carousel Section</h2>
                         <p class="text-xs text-app-muted">Manage the sculpted pop-out product cards displayed in the New Arrivals carousel on the homepage</p>
                     </div>
-                    <button onclick="document.getElementById('add-new-arrival-modal').classList.remove('hidden')" class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-app-title text-xs font-bold transition-all shadow-lg shadow-purple-600/30 flex items-center space-x-1.5 self-start">
+                    <button onclick="openCmsModal('add-new-arrival-modal')" class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-app-title text-xs font-bold transition-all shadow-lg shadow-purple-600/30 flex items-center space-x-1.5 self-start">
                         <span>＋</span>
                         <span>Add New Arrival Item</span>
                     </button>
@@ -715,7 +729,7 @@ $products_list = $stmtProducts->fetchAll();
                             <p class="text-sm font-semibold text-app-muted">No New Arrival items yet. Click "+ Add New Arrival Item" to add one.</p>
                         </div>
                     <?php else: ?>
-                        <?php foreach ($new_arrival_items as $item): ?>
+                        <?php foreach ($new_arrival_items_paged as $item): ?>
                             <div class="p-5 rounded-2xl bg-app-card border border-app flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition-all hover:border-app">
                                 
                                 <!-- Thumbnail & Info -->
@@ -797,6 +811,9 @@ $products_list = $stmtProducts->fetchAll();
                     <?php endif; ?>
                 </div>
 
+                <!-- New Arrivals Section Pagination -->
+                <?= render_admin_pagination(count($new_arrival_items), $cms_per_page, $cms_page) ?>
+
             </div>
         <?php endif; ?>
 
@@ -812,7 +829,7 @@ $products_list = $stmtProducts->fetchAll();
                         <h2 class="text-lg font-black text-app-title brand-font">Flash Sale Deals</h2>
                         <p class="text-xs text-app-muted">Manage the 5 promotional product cards displayed under the 10.10 countdown timer</p>
                     </div>
-                    <button onclick="document.getElementById('add-flash-sale-modal').classList.remove('hidden')" class="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition-all shadow-lg shadow-amber-600/30 flex items-center space-x-1.5 self-start">
+                    <button onclick="openCmsModal('add-flash-sale-modal')" class="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition-all shadow-lg shadow-amber-600/30 flex items-center space-x-1.5 self-start">
                         <span>＋</span>
                         <span>Add Flash Sale Deal</span>
                     </button>
@@ -831,7 +848,7 @@ $products_list = $stmtProducts->fetchAll();
                             No flash sale deals added yet. Click &quot;Add Flash Sale Deal&quot; to create one.
                         </div>
                     <?php else: ?>
-                        <?php foreach ($flash_sale_items as $item): ?>
+                        <?php foreach ($flash_sale_items_paged as $item): ?>
                             <div class="bg-app-card border border-app rounded-2xl p-3.5 flex flex-col justify-between space-y-3 relative overflow-hidden group">
                                 <!-- Top Ribbon Preview -->
                                 <div class="w-full bg-gradient-to-r from-blue-600 via-cyan-500 to-orange-500 rounded-lg px-2 py-1 flex items-center justify-between text-white text-[9px] font-bold">
@@ -897,6 +914,9 @@ $products_list = $stmtProducts->fetchAll();
                     <?php endif; ?>
                 </div>
 
+                <!-- Flash Sale Section Pagination -->
+                <?= render_admin_pagination(count($flash_sale_items), $cms_per_page, $cms_page) ?>
+
             </div>
         <?php endif; ?>
 
@@ -909,11 +929,11 @@ $products_list = $stmtProducts->fetchAll();
 <!-- ===================================================================== -->
 
 <!-- 1. ADD HERO MODAL -->
-<div id="add-hero-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex justify-center items-start">
+<div id="add-hero-modal" style="display: none;" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 justify-center items-start">
     <div class="bg-app-card border border-app rounded-3xl max-w-lg w-full max-h-[92vh] flex flex-col my-auto sm:my-8 shadow-2xl relative overflow-hidden">
         <div class="p-5 sm:p-6 pb-3.5 border-b border-app flex items-center justify-between shrink-0">
             <h3 class="text-base font-black text-app-title brand-font">Upload New Hero Banner Image</h3>
-            <button type="button" onclick="closeCmsModal('add-hero-modal')" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-app-muted hover:text-white flex items-center justify-center text-lg transition-colors">&times;</button>
+            <button type="button" onclick="closeCmsModal('')" class="w-8 h-8 rounded-full bg-slate-500/15 hover:bg-red-500/20 text-app-muted hover:text-red-500 flex items-center justify-center transition-all cursor-pointer border border-app shadow-sm" title="Close dialog"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
 
         <form method="POST" action="cms.php?tab=hero" enctype="multipart/form-data" class="flex-1 flex flex-col min-h-0 overflow-hidden">
@@ -921,23 +941,13 @@ $products_list = $stmtProducts->fetchAll();
             <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
             <input type="hidden" name="action" value="add_hero">
 
-            <!-- Searchable Catalog Product Selector -->
+                        <!-- Searchable Select2 Catalog Product Selector -->
             <div class="p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/25 space-y-2">
-                <div class="flex items-center justify-between">
-                    <label class="block text-xs font-black text-blue-400 uppercase tracking-wide flex items-center space-x-1.5">
-                        <span>⚡ Feature a Catalog Product (Auto-Fills Details & Slug Link)</span>
-                    </label>
-                    <span class="text-[10px] text-blue-300 font-mono" id="add_hero_count_badge"><?= count($products_list) ?> products</span>
-                </div>
-                <!-- Live Search Box -->
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">🔍</span>
-                    <input type="text" id="add_hero_search" oninput="filterProductPicker(this, 'add_hero_product_picker', 'add_hero_count_badge')" placeholder="Type to filter products by name, SKU or slug..." class="w-full pl-8 pr-8 py-2 rounded-xl bg-slate-900 border border-blue-500/30 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-blue-400">
-                    <button type="button" onclick="clearProductPickerSearch('add_hero_search', 'add_hero_product_picker', 'add_hero_count_badge')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-white text-xs" title="Clear search">&times;</button>
-                </div>
-                <!-- Filterable Select List -->
-                <select id="add_hero_product_picker" size="4" class="w-full px-2 py-1.5 rounded-xl input-app border border-app text-app-title text-xs font-medium cursor-pointer overflow-y-auto" onchange="onHeroProductSelect(this, 'add')">
-                    <option value="" class="py-1 text-slate-400">-- Choose Existing Product (Optional) --</option>
+                <label class="block text-xs font-black text-blue-500 dark:text-blue-400 uppercase tracking-wide flex items-center space-x-1.5">
+                    <span>⚡ Feature a Catalog Product (Auto-Fills Details &amp; Link)</span>
+                </label>
+                <select id="add_hero_product_picker" class="cms-product-select2 w-full" data-modal="#add-hero-modal" data-placeholder="-- Choose Existing Product (Optional) --" onchange="onHeroProductSelect(this, 'add')">
+                    <option value="">-- Choose Existing Product (Optional) --</option>
                     <?php foreach ($products_list as $prod): ?>
                     <option value="<?= $prod['id'] ?>" 
                             data-name="<?= e($prod['name']) ?>" 
@@ -946,15 +956,12 @@ $products_list = $stmtProducts->fetchAll();
                             data-badge="<?= e($prod['badge_text']) ?>" 
                             data-image="<?= e($prod['main_image']) ?>"
                             data-price="<?= $prod['price'] ?? 0 ?>"
-                            data-orig="<?= $prod['original_price'] ?? 0 ?>"
-                            class="py-1.5 px-2 hover:bg-blue-600/30 rounded cursor-pointer">
-                        <?= e($prod['name']) ?> (<?= !empty($prod['sku']) ? e($prod['sku']).' • ' : '' ?>slug: <?= e($prod['slug']) ?>)
+                            data-orig="<?= $prod['original_price'] ?? 0 ?>">
+                        <?= e($prod['name']) ?> <?= !empty($prod['sku']) ? '(' . e($prod['sku']) . ')' : '' ?> &bull; slug: <?= e($prod['slug']) ?>
                     </option>
                     <?php endforeach; ?>
                 </select>
-                <div class="flex items-center justify-between text-[10.5px] text-blue-300/80">
-                    <span>Click any product above to auto-populate title, slug link &amp; details</span>
-                </div>
+                <div class="text-[10.5px] text-blue-500/80 dark:text-blue-300/80">Type in dropdown to search by title, SKU, or slug to auto-populate</div>
             </div>
 
             <div>
@@ -1018,7 +1025,7 @@ $products_list = $stmtProducts->fetchAll();
             </div>
 
             <div class="p-4 px-6 border-t border-app bg-app-card/95 flex justify-end space-x-2 shrink-0">
-                <button type="button" onclick="closeCmsModal('add-hero-modal')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-app-body text-xs font-bold">Cancel</button>
+                <button type="button" onclick="closeCmsModal('')" class="px-4 py-2 rounded-xl bg-slate-500/15 hover:bg-slate-500/25 text-app-title border border-app text-xs font-semibold cursor-pointer transition-colors">Cancel</button>
                 <button type="submit" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-app-title text-xs font-bold shadow-lg">Save Slide</button>
             </div>
         </form>
@@ -1026,11 +1033,11 @@ $products_list = $stmtProducts->fetchAll();
 </div>
 
 <!-- 2. EDIT HERO MODAL -->
-<div id="edit-hero-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex justify-center items-start">
+<div id="edit-hero-modal" style="display: none;" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 justify-center items-start">
     <div class="bg-app-card border border-app rounded-3xl max-w-lg w-full max-h-[92vh] flex flex-col my-auto sm:my-8 shadow-2xl relative overflow-hidden">
         <div class="p-5 sm:p-6 pb-3.5 border-b border-app flex items-center justify-between shrink-0">
             <h3 class="text-base font-black text-app-title brand-font">Edit Hero Banner Slide</h3>
-            <button type="button" onclick="closeCmsModal('edit-hero-modal')" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-app-muted hover:text-white flex items-center justify-center text-lg transition-colors">&times;</button>
+            <button type="button" onclick="closeCmsModal('')" class="w-8 h-8 rounded-full bg-slate-500/15 hover:bg-red-500/20 text-app-muted hover:text-red-500 flex items-center justify-center transition-all cursor-pointer border border-app shadow-sm" title="Close dialog"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
 
         <form method="POST" action="cms.php?tab=hero" enctype="multipart/form-data" class="flex-1 flex flex-col min-h-0 overflow-hidden">
@@ -1039,23 +1046,13 @@ $products_list = $stmtProducts->fetchAll();
             <input type="hidden" name="action" value="edit_hero">
             <input type="hidden" id="edit_hero_id" name="id" value="">
 
-            <!-- Searchable Catalog Product Selector -->
+                        <!-- Searchable Select2 Catalog Product Selector -->
             <div class="p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/25 space-y-2">
-                <div class="flex items-center justify-between">
-                    <label class="block text-xs font-black text-blue-400 uppercase tracking-wide flex items-center space-x-1.5">
-                        <span>⚡ Link to Catalog Product (Auto-updates Slug & Details)</span>
-                    </label>
-                    <span class="text-[10px] text-blue-300 font-mono" id="edit_hero_count_badge"><?= count($products_list) ?> products</span>
-                </div>
-                <!-- Live Search Box -->
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">🔍</span>
-                    <input type="text" id="edit_hero_search" oninput="filterProductPicker(this, 'edit_hero_product_picker', 'edit_hero_count_badge')" placeholder="Type to filter products by name, SKU or slug..." class="w-full pl-8 pr-8 py-2 rounded-xl bg-slate-900 border border-blue-500/30 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-blue-400">
-                    <button type="button" onclick="clearProductPickerSearch('edit_hero_search', 'edit_hero_product_picker', 'edit_hero_count_badge')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-white text-xs" title="Clear search">&times;</button>
-                </div>
-                <!-- Filterable Select List -->
-                <select id="edit_hero_product_picker" size="4" class="w-full px-2 py-1.5 rounded-xl input-app border border-app text-app-title text-xs font-medium cursor-pointer overflow-y-auto" onchange="onHeroProductSelect(this, 'edit')">
-                    <option value="" class="py-1 text-slate-400">-- Keep Existing / Custom URL --</option>
+                <label class="block text-xs font-black text-blue-500 dark:text-blue-400 uppercase tracking-wide flex items-center space-x-1.5">
+                    <span>⚡ Link to Catalog Product (Auto-updates Slug &amp; Details)</span>
+                </label>
+                <select id="edit_hero_product_picker" class="cms-product-select2 w-full" data-modal="#edit-hero-modal" data-placeholder="-- Keep Existing / Custom URL --" onchange="onHeroProductSelect(this, 'edit')">
+                    <option value="">-- Keep Existing / Custom URL --</option>
                     <?php foreach ($products_list as $prod): ?>
                     <option value="<?= $prod['id'] ?>" 
                             data-name="<?= e($prod['name']) ?>" 
@@ -1064,15 +1061,12 @@ $products_list = $stmtProducts->fetchAll();
                             data-badge="<?= e($prod['badge_text']) ?>" 
                             data-image="<?= e($prod['main_image']) ?>"
                             data-price="<?= $prod['price'] ?? 0 ?>"
-                            data-orig="<?= $prod['original_price'] ?? 0 ?>"
-                            class="py-1.5 px-2 hover:bg-blue-600/30 rounded cursor-pointer">
-                        <?= e($prod['name']) ?> (<?= !empty($prod['sku']) ? e($prod['sku']).' • ' : '' ?>slug: <?= e($prod['slug']) ?>)
+                            data-orig="<?= $prod['original_price'] ?? 0 ?>">
+                        <?= e($prod['name']) ?> <?= !empty($prod['sku']) ? '(' . e($prod['sku']) . ')' : '' ?> &bull; slug: <?= e($prod['slug']) ?>
                     </option>
                     <?php endforeach; ?>
                 </select>
-                <div class="flex items-center justify-between text-[10.5px] text-blue-300/80">
-                    <span>Click any product above to auto-populate title, slug link &amp; details</span>
-                </div>
+                <div class="text-[10.5px] text-blue-500/80 dark:text-blue-300/80">Type in dropdown to search by title, SKU, or slug to auto-populate</div>
             </div>
 
             <div>
@@ -1130,7 +1124,7 @@ $products_list = $stmtProducts->fetchAll();
             </div>
 
             <div class="p-4 px-6 border-t border-app bg-app-card/95 flex justify-end space-x-2 shrink-0">
-                <button type="button" onclick="closeCmsModal('edit-hero-modal')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-app-body text-xs font-bold">Cancel</button>
+                <button type="button" onclick="closeCmsModal('')" class="px-4 py-2 rounded-xl bg-slate-500/15 hover:bg-slate-500/25 text-app-title border border-app text-xs font-semibold cursor-pointer transition-colors">Cancel</button>
                 <button type="submit" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-app-title text-xs font-bold shadow-lg">Update Slide</button>
             </div>
         </form>
@@ -1138,11 +1132,11 @@ $products_list = $stmtProducts->fetchAll();
 </div>
 
 <!-- 3. ADD SPOTLIGHT MODAL -->
-<div id="add-spotlight-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex justify-center items-start">
+<div id="add-spotlight-modal" style="display: none;" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 justify-center items-start">
     <div class="bg-app-card border border-app rounded-3xl max-w-lg w-full max-h-[92vh] flex flex-col my-auto sm:my-8 shadow-2xl relative overflow-hidden">
         <div class="p-5 sm:p-6 pb-3.5 border-b border-app flex items-center justify-between shrink-0">
             <h3 class="text-base font-black text-app-title brand-font">Upload Product Spotlight Image</h3>
-            <button type="button" onclick="closeCmsModal('add-spotlight-modal')" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-app-muted hover:text-white flex items-center justify-center text-lg transition-colors">&times;</button>
+            <button type="button" onclick="closeCmsModal('')" class="w-8 h-8 rounded-full bg-slate-500/15 hover:bg-red-500/20 text-app-muted hover:text-red-500 flex items-center justify-center transition-all cursor-pointer border border-app shadow-sm" title="Close dialog"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
 
         <form method="POST" action="cms.php?tab=spotlight" enctype="multipart/form-data" class="flex-1 flex flex-col min-h-0 overflow-hidden">
@@ -1150,23 +1144,13 @@ $products_list = $stmtProducts->fetchAll();
             <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
             <input type="hidden" name="action" value="add_spotlight">
 
-            <!-- Searchable Catalog Product Selector -->
+                        <!-- Searchable Select2 Catalog Product Selector -->
             <div class="p-3.5 rounded-2xl bg-orange-500/10 border border-orange-500/25 space-y-2">
-                <div class="flex items-center justify-between">
-                    <label class="block text-xs font-black text-orange-400 uppercase tracking-wide flex items-center space-x-1.5">
-                        <span>⚡ Select Product From Catalog (Auto-Fills Slug Link)</span>
-                    </label>
-                    <span class="text-[10px] text-orange-300 font-mono" id="add_spot_count_badge"><?= count($products_list) ?> products</span>
-                </div>
-                <!-- Live Search Box -->
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">🔍</span>
-                    <input type="text" id="add_spot_search" oninput="filterProductPicker(this, 'add_spot_product_picker', 'add_spot_count_badge')" placeholder="Type to filter products by name, SKU or slug..." class="w-full pl-8 pr-8 py-2 rounded-xl bg-slate-900 border border-orange-500/30 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-orange-400">
-                    <button type="button" onclick="clearProductPickerSearch('add_spot_search', 'add_spot_product_picker', 'add_spot_count_badge')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-white text-xs" title="Clear search">&times;</button>
-                </div>
-                <!-- Filterable Select List -->
-                <select id="add_spot_product_picker" size="4" class="w-full px-2 py-1.5 rounded-xl input-app border border-app text-app-title text-xs font-medium cursor-pointer overflow-y-auto" onchange="onSpotlightProductSelect(this, 'add')">
-                    <option value="" class="py-1 text-slate-400">-- Choose Existing Product (Optional) --</option>
+                <label class="block text-xs font-black text-orange-500 dark:text-orange-400 uppercase tracking-wide flex items-center space-x-1.5">
+                    <span>⚡ Select Product From Catalog (Auto-Fills Slug Link)</span>
+                </label>
+                <select id="add_spot_product_picker" class="cms-product-select2 w-full" data-modal="#add-spotlight-modal" data-placeholder="-- Choose Existing Product (Optional) --" onchange="onSpotlightProductSelect(this, 'add')">
+                    <option value="">-- Choose Existing Product (Optional) --</option>
                     <?php foreach ($products_list as $prod): ?>
                     <option value="<?= $prod['id'] ?>" 
                             data-name="<?= e($prod['name']) ?>" 
@@ -1175,15 +1159,12 @@ $products_list = $stmtProducts->fetchAll();
                             data-badge="<?= e($prod['badge_text']) ?>" 
                             data-image="<?= e($prod['main_image']) ?>"
                             data-price="<?= $prod['price'] ?? 0 ?>"
-                            data-orig="<?= $prod['original_price'] ?? 0 ?>"
-                            class="py-1.5 px-2 hover:bg-orange-600/30 rounded cursor-pointer">
-                        <?= e($prod['name']) ?> (<?= !empty($prod['sku']) ? e($prod['sku']).' • ' : '' ?>slug: <?= e($prod['slug']) ?>)
+                            data-orig="<?= $prod['original_price'] ?? 0 ?>">
+                        <?= e($prod['name']) ?> <?= !empty($prod['sku']) ? '(' . e($prod['sku']) . ')' : '' ?> &bull; slug: <?= e($prod['slug']) ?>
                     </option>
                     <?php endforeach; ?>
                 </select>
-                <div class="flex items-center justify-between text-[10.5px] text-orange-300/80">
-                    <span>Click any product above to auto-populate title, slug link &amp; details</span>
-                </div>
+                <div class="text-[10.5px] text-orange-500/80 dark:text-orange-300/80">Type in dropdown to search by title, SKU, or slug to auto-populate</div>
             </div>
 
             <div>
@@ -1229,7 +1210,7 @@ $products_list = $stmtProducts->fetchAll();
             </div>
 
             <div class="p-4 px-6 border-t border-app bg-app-card/95 flex justify-end space-x-2 shrink-0">
-                <button type="button" onclick="closeCmsModal('add-spotlight-modal')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-app-body text-xs font-bold">Cancel</button>
+                <button type="button" onclick="closeCmsModal('')" class="px-4 py-2 rounded-xl bg-slate-500/15 hover:bg-slate-500/25 text-app-title border border-app text-xs font-semibold cursor-pointer transition-colors">Cancel</button>
                 <button type="submit" class="px-5 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-app-title text-xs font-bold shadow-lg">Save Product</button>
             </div>
         </form>
@@ -1237,11 +1218,11 @@ $products_list = $stmtProducts->fetchAll();
 </div>
 
 <!-- 4. EDIT SPOTLIGHT MODAL -->
-<div id="edit-spotlight-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex justify-center items-start">
+<div id="edit-spotlight-modal" style="display: none;" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 justify-center items-start">
     <div class="bg-app-card border border-app rounded-3xl max-w-lg w-full max-h-[92vh] flex flex-col my-auto sm:my-8 shadow-2xl relative overflow-hidden">
         <div class="p-5 sm:p-6 pb-3.5 border-b border-app flex items-center justify-between shrink-0">
             <h3 class="text-base font-black text-app-title brand-font">Edit Product Spotlight Image</h3>
-            <button type="button" onclick="closeCmsModal('edit-spotlight-modal')" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-app-muted hover:text-white flex items-center justify-center text-lg transition-colors">&times;</button>
+            <button type="button" onclick="closeCmsModal('')" class="w-8 h-8 rounded-full bg-slate-500/15 hover:bg-red-500/20 text-app-muted hover:text-red-500 flex items-center justify-center transition-all cursor-pointer border border-app shadow-sm" title="Close dialog"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
 
         <form method="POST" action="cms.php?tab=spotlight" enctype="multipart/form-data" class="flex-1 flex flex-col min-h-0 overflow-hidden">
@@ -1251,23 +1232,13 @@ $products_list = $stmtProducts->fetchAll();
             <input type="hidden" id="edit_spot_id" name="id" value="">
 
             <!-- Quick Catalog Product Selector -->
-            <!-- Searchable Catalog Product Selector -->
+                        <!-- Searchable Select2 Catalog Product Selector -->
             <div class="p-3.5 rounded-2xl bg-orange-500/10 border border-orange-500/25 space-y-2">
-                <div class="flex items-center justify-between">
-                    <label class="block text-xs font-black text-orange-400 uppercase tracking-wide flex items-center space-x-1.5">
-                        <span>⚡ Link to Catalog Product (Auto-updates Slug &amp; Details)</span>
-                    </label>
-                    <span class="text-[10px] text-orange-300 font-mono" id="edit_spot_count_badge"><?= count($products_list) ?> products</span>
-                </div>
-                <!-- Live Search Box -->
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">🔍</span>
-                    <input type="text" id="edit_spot_search" oninput="filterProductPicker(this, 'edit_spot_product_picker', 'edit_spot_count_badge')" placeholder="Type to filter products by name, SKU or slug..." class="w-full pl-8 pr-8 py-2 rounded-xl bg-slate-900 border border-orange-500/30 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-orange-400">
-                    <button type="button" onclick="clearProductPickerSearch('edit_spot_search', 'edit_spot_product_picker', 'edit_spot_count_badge')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-white text-xs" title="Clear search">&times;</button>
-                </div>
-                <!-- Filterable Select List -->
-                <select id="edit_spot_product_picker" size="4" class="w-full px-2 py-1.5 rounded-xl input-app border border-app text-app-title text-xs font-medium cursor-pointer overflow-y-auto" onchange="onSpotlightProductSelect(this, 'edit')">
-                    <option value="" class="py-1 text-slate-400">-- Keep Existing Link / Custom URL --</option>
+                <label class="block text-xs font-black text-orange-500 dark:text-orange-400 uppercase tracking-wide flex items-center space-x-1.5">
+                    <span>⚡ Link to Catalog Product (Auto-updates Slug &amp; Details)</span>
+                </label>
+                <select id="edit_spot_product_picker" class="cms-product-select2 w-full" data-modal="#edit-spotlight-modal" data-placeholder="-- Keep Existing Link / Custom URL --" onchange="onSpotlightProductSelect(this, 'edit')">
+                    <option value="">-- Keep Existing Link / Custom URL --</option>
                     <?php foreach ($products_list as $prod): ?>
                     <option value="<?= $prod['id'] ?>" 
                             data-name="<?= e($prod['name']) ?>" 
@@ -1276,15 +1247,12 @@ $products_list = $stmtProducts->fetchAll();
                             data-badge="<?= e($prod['badge_text']) ?>" 
                             data-image="<?= e($prod['main_image']) ?>"
                             data-price="<?= $prod['price'] ?? 0 ?>"
-                            data-orig="<?= $prod['original_price'] ?? 0 ?>"
-                            class="py-1.5 px-2 hover:bg-orange-600/30 rounded cursor-pointer">
-                        <?= e($prod['name']) ?> (<?= !empty($prod['sku']) ? e($prod['sku']).' • ' : '' ?>slug: <?= e($prod['slug']) ?>)
+                            data-orig="<?= $prod['original_price'] ?? 0 ?>">
+                        <?= e($prod['name']) ?> <?= !empty($prod['sku']) ? '(' . e($prod['sku']) . ')' : '' ?> &bull; slug: <?= e($prod['slug']) ?>
                     </option>
                     <?php endforeach; ?>
                 </select>
-                <div class="flex items-center justify-between text-[10.5px] text-orange-300/80">
-                    <span>Click any product above to auto-populate title, slug link &amp; details</span>
-                </div>
+                <div class="text-[10.5px] text-orange-500/80 dark:text-orange-300/80">Type in dropdown to search by title, SKU, or slug to auto-populate</div>
             </div>
 
             <div>
@@ -1324,7 +1292,7 @@ $products_list = $stmtProducts->fetchAll();
             </div>
 
             <div class="p-4 px-6 border-t border-app bg-app-card/95 flex justify-end space-x-2 shrink-0">
-                <button type="button" onclick="closeCmsModal('edit-spotlight-modal')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-app-body text-xs font-bold">Cancel</button>
+                <button type="button" onclick="closeCmsModal('')" class="px-4 py-2 rounded-xl bg-slate-500/15 hover:bg-slate-500/25 text-app-title border border-app text-xs font-semibold cursor-pointer transition-colors">Cancel</button>
                 <button type="submit" class="px-5 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-app-title text-xs font-bold shadow-lg">Update Product</button>
             </div>
         </form>
@@ -1332,11 +1300,11 @@ $products_list = $stmtProducts->fetchAll();
 </div>
 
 <!-- 5. ADD NEW ARRIVAL MODAL -->
-<div id="add-new-arrival-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex justify-center items-start">
+<div id="add-new-arrival-modal" style="display: none;" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 justify-center items-start">
     <div class="bg-app-card border border-app rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col my-auto sm:my-8 shadow-2xl relative overflow-hidden">
         <div class="p-5 sm:p-6 pb-3.5 border-b border-app flex items-center justify-between shrink-0">
             <h3 class="text-base font-black text-app-title brand-font">Add New Arrival Product Card</h3>
-            <button type="button" onclick="closeCmsModal('add-new-arrival-modal')" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-app-muted hover:text-white flex items-center justify-center text-lg transition-colors">&times;</button>
+            <button type="button" onclick="closeCmsModal('')" class="w-8 h-8 rounded-full bg-slate-500/15 hover:bg-red-500/20 text-app-muted hover:text-red-500 flex items-center justify-center transition-all cursor-pointer border border-app shadow-sm" title="Close dialog"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
 
         <form method="POST" action="cms.php?tab=new_arrivals" enctype="multipart/form-data" class="flex-1 flex flex-col min-h-0 overflow-hidden">
@@ -1345,23 +1313,13 @@ $products_list = $stmtProducts->fetchAll();
             <input type="hidden" name="action" value="add_new_arrival">
 
             <!-- 1. Quick Catalog Product Selector -->
-            <!-- Searchable Catalog Product Selector -->
+                        <!-- Searchable Select2 Catalog Product Selector -->
             <div class="p-3.5 rounded-2xl bg-purple-500/10 border border-purple-500/25 space-y-2">
-                <div class="flex items-center justify-between">
-                    <label class="block text-xs font-black text-purple-400 uppercase tracking-wide flex items-center space-x-1.5">
-                        <span>⚡ Select Product From Catalog (Auto-Fills Details &amp; Slug Link)</span>
-                    </label>
-                    <span class="text-[10px] text-purple-300 font-mono" id="add_arr_count_badge"><?= count($products_list) ?> products</span>
-                </div>
-                <!-- Live Search Box -->
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">🔍</span>
-                    <input type="text" id="add_arr_search" oninput="filterProductPicker(this, 'add_arr_product_picker', 'add_arr_count_badge')" placeholder="Type to filter products by name, SKU or slug..." class="w-full pl-8 pr-8 py-2 rounded-xl bg-slate-900 border border-purple-500/30 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-purple-400">
-                    <button type="button" onclick="clearProductPickerSearch('add_arr_search', 'add_arr_product_picker', 'add_arr_count_badge')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-white text-xs" title="Clear search">&times;</button>
-                </div>
-                <!-- Filterable Select List -->
-                <select id="add_arr_product_picker" size="4" class="w-full px-2 py-1.5 rounded-xl input-app border border-app text-app-title text-xs font-medium cursor-pointer overflow-y-auto" onchange="onNewArrivalProductSelect(this, 'add')">
-                    <option value="" class="py-1 text-slate-400">-- Choose Existing Product from Store --</option>
+                <label class="block text-xs font-black text-purple-500 dark:text-purple-400 uppercase tracking-wide flex items-center space-x-1.5">
+                    <span>⚡ Select Product From Catalog (Auto-Fills Details &amp; Slug Link)</span>
+                </label>
+                <select id="add_arr_product_picker" class="cms-product-select2 w-full" data-modal="#add-new-arrival-modal" data-placeholder="-- Choose Existing Product from Store --" onchange="onNewArrivalProductSelect(this, 'add')">
+                    <option value="">-- Choose Existing Product from Store --</option>
                     <?php foreach ($products_list as $prod): ?>
                     <option value="<?= $prod['id'] ?>" 
                             data-name="<?= e($prod['name']) ?>" 
@@ -1370,15 +1328,12 @@ $products_list = $stmtProducts->fetchAll();
                             data-badge="<?= e($prod['badge_text']) ?>" 
                             data-image="<?= e($prod['main_image']) ?>"
                             data-price="<?= $prod['price'] ?? 0 ?>"
-                            data-orig="<?= $prod['original_price'] ?? 0 ?>"
-                            class="py-1.5 px-2 hover:bg-purple-600/30 rounded cursor-pointer">
-                        <?= e($prod['name']) ?> (<?= !empty($prod['sku']) ? e($prod['sku']).' • ' : '' ?>slug: <?= e($prod['slug']) ?>)
+                            data-orig="<?= $prod['original_price'] ?? 0 ?>">
+                        <?= e($prod['name']) ?> <?= !empty($prod['sku']) ? '(' . e($prod['sku']) . ')' : '' ?> &bull; slug: <?= e($prod['slug']) ?>
                     </option>
                     <?php endforeach; ?>
                 </select>
-                <div class="flex items-center justify-between text-[10.5px] text-purple-300/80">
-                    <span>Click any product above to auto-populate title, slug link &amp; details</span>
-                </div>
+                <div class="text-[10.5px] text-purple-500/80 dark:text-purple-300/80">Type in dropdown to search by title, SKU, or slug to auto-populate</div>
             </div>
 
             <!-- Image File / Path -->
@@ -1460,7 +1415,7 @@ $products_list = $stmtProducts->fetchAll();
             </div>
 
             <div class="p-4 px-6 border-t border-app bg-app-card/95 flex justify-end space-x-2 shrink-0">
-                <button type="button" onclick="closeCmsModal('add-new-arrival-modal')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-app-body text-xs font-bold">Cancel</button>
+                <button type="button" onclick="closeCmsModal('')" class="px-4 py-2 rounded-xl bg-slate-500/15 hover:bg-slate-500/25 text-app-title border border-app text-xs font-semibold cursor-pointer transition-colors">Cancel</button>
                 <button type="submit" class="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-app-title text-xs font-bold shadow-lg">Save New Arrival</button>
             </div>
         </form>
@@ -1468,11 +1423,11 @@ $products_list = $stmtProducts->fetchAll();
 </div>
 
 <!-- 6. EDIT NEW ARRIVAL MODAL -->
-<div id="edit-new-arrival-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex justify-center items-start">
+<div id="edit-new-arrival-modal" style="display: none;" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 justify-center items-start">
     <div class="bg-app-card border border-app rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col my-auto sm:my-8 shadow-2xl relative overflow-hidden">
         <div class="p-5 sm:p-6 pb-3.5 border-b border-app flex items-center justify-between shrink-0">
             <h3 class="text-base font-black text-app-title brand-font">Edit New Arrival Product Card</h3>
-            <button type="button" onclick="closeCmsModal('edit-new-arrival-modal')" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-app-muted hover:text-white flex items-center justify-center text-lg transition-colors">&times;</button>
+            <button type="button" onclick="closeCmsModal('')" class="w-8 h-8 rounded-full bg-slate-500/15 hover:bg-red-500/20 text-app-muted hover:text-red-500 flex items-center justify-center transition-all cursor-pointer border border-app shadow-sm" title="Close dialog"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
 
         <form method="POST" action="cms.php?tab=new_arrivals" enctype="multipart/form-data" class="flex-1 flex flex-col min-h-0 overflow-hidden">
@@ -1482,23 +1437,13 @@ $products_list = $stmtProducts->fetchAll();
             <input type="hidden" id="edit_arr_id" name="id" value="">
 
             <!-- Quick Catalog Product Selector -->
-            <!-- Searchable Catalog Product Selector -->
+                        <!-- Searchable Select2 Catalog Product Selector -->
             <div class="p-3.5 rounded-2xl bg-purple-500/10 border border-purple-500/25 space-y-2">
-                <div class="flex items-center justify-between">
-                    <label class="block text-xs font-black text-purple-400 uppercase tracking-wide flex items-center space-x-1.5">
-                        <span>⚡ Link to Catalog Product (Auto-updates Slug &amp; Details)</span>
-                    </label>
-                    <span class="text-[10px] text-purple-300 font-mono" id="edit_arr_count_badge"><?= count($products_list) ?> products</span>
-                </div>
-                <!-- Live Search Box -->
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">🔍</span>
-                    <input type="text" id="edit_arr_search" oninput="filterProductPicker(this, 'edit_arr_product_picker', 'edit_arr_count_badge')" placeholder="Type to filter products by name, SKU or slug..." class="w-full pl-8 pr-8 py-2 rounded-xl bg-slate-900 border border-purple-500/30 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-purple-400">
-                    <button type="button" onclick="clearProductPickerSearch('edit_arr_search', 'edit_arr_product_picker', 'edit_arr_count_badge')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-white text-xs" title="Clear search">&times;</button>
-                </div>
-                <!-- Filterable Select List -->
-                <select id="edit_arr_product_picker" size="4" class="w-full px-2 py-1.5 rounded-xl input-app border border-app text-app-title text-xs font-medium cursor-pointer overflow-y-auto" onchange="onNewArrivalProductSelect(this, 'edit')">
-                    <option value="" class="py-1 text-slate-400">-- Keep Existing Link / Custom URL --</option>
+                <label class="block text-xs font-black text-purple-500 dark:text-purple-400 uppercase tracking-wide flex items-center space-x-1.5">
+                    <span>⚡ Link to Catalog Product (Auto-updates Slug &amp; Details)</span>
+                </label>
+                <select id="edit_arr_product_picker" class="cms-product-select2 w-full" data-modal="#edit-new-arrival-modal" data-placeholder="-- Keep Existing Link / Custom URL --" onchange="onNewArrivalProductSelect(this, 'edit')">
+                    <option value="">-- Keep Existing Link / Custom URL --</option>
                     <?php foreach ($products_list as $prod): ?>
                     <option value="<?= $prod['id'] ?>" 
                             data-name="<?= e($prod['name']) ?>" 
@@ -1507,15 +1452,12 @@ $products_list = $stmtProducts->fetchAll();
                             data-badge="<?= e($prod['badge_text']) ?>" 
                             data-image="<?= e($prod['main_image']) ?>"
                             data-price="<?= $prod['price'] ?? 0 ?>"
-                            data-orig="<?= $prod['original_price'] ?? 0 ?>"
-                            class="py-1.5 px-2 hover:bg-purple-600/30 rounded cursor-pointer">
-                        <?= e($prod['name']) ?> (<?= !empty($prod['sku']) ? e($prod['sku']).' • ' : '' ?>slug: <?= e($prod['slug']) ?>)
+                            data-orig="<?= $prod['original_price'] ?? 0 ?>">
+                        <?= e($prod['name']) ?> <?= !empty($prod['sku']) ? '(' . e($prod['sku']) . ')' : '' ?> &bull; slug: <?= e($prod['slug']) ?>
                     </option>
                     <?php endforeach; ?>
                 </select>
-                <div class="flex items-center justify-between text-[10.5px] text-purple-300/80">
-                    <span>Click any product above to auto-populate title, slug link &amp; details</span>
-                </div>
+                <div class="text-[10.5px] text-purple-500/80 dark:text-purple-300/80">Type in dropdown to search by title, SKU, or slug to auto-populate</div>
             </div>
 
             <!-- Replace Image -->
@@ -1591,7 +1533,7 @@ $products_list = $stmtProducts->fetchAll();
             </div>
 
             <div class="p-4 px-6 border-t border-app bg-app-card/95 flex justify-end space-x-2 shrink-0">
-                <button type="button" onclick="closeCmsModal('edit-new-arrival-modal')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-app-body text-xs font-bold">Cancel</button>
+                <button type="button" onclick="closeCmsModal('')" class="px-4 py-2 rounded-xl bg-slate-500/15 hover:bg-slate-500/25 text-app-title border border-app text-xs font-semibold cursor-pointer transition-colors">Cancel</button>
                 <button type="submit" class="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-app-title text-xs font-bold shadow-lg">Update New Arrival</button>
             </div>
         </form>
@@ -1601,14 +1543,14 @@ $products_list = $stmtProducts->fetchAll();
 <!-- ===================================================================== -->
 <!-- 7. ADD FLASH SALE MODAL -->
 <!-- ===================================================================== -->
-<div id="add-flash-sale-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex justify-center items-start">
+<div id="add-flash-sale-modal" style="display: none;" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 justify-center items-start">
     <div class="bg-app-card border border-app rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col my-auto sm:my-8 shadow-2xl relative overflow-hidden">
         <div class="p-5 sm:p-6 pb-3.5 border-b border-app flex items-center justify-between shrink-0">
             <div>
                 <h3 class="text-base font-black text-app-title brand-font">Add Flash Sale Deal</h3>
                 <p class="text-xs text-app-muted">Create a promotional card for the 10.10 live countdown section</p>
             </div>
-            <button type="button" onclick="closeCmsModal('add-flash-sale-modal')" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-app-muted hover:text-white flex items-center justify-center text-lg transition-colors">&times;</button>
+            <button type="button" onclick="closeCmsModal('')" class="w-8 h-8 rounded-full bg-slate-500/15 hover:bg-red-500/20 text-app-muted hover:text-red-500 flex items-center justify-center transition-all cursor-pointer border border-app shadow-sm" title="Close dialog"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
 
         <form method="POST" action="cms.php?tab=flash_sale" enctype="multipart/form-data" class="flex-1 flex flex-col min-h-0 overflow-hidden">
@@ -1616,23 +1558,13 @@ $products_list = $stmtProducts->fetchAll();
             <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
             <input type="hidden" name="action" value="add_flash_sale">
 
-            <!-- Searchable Catalog Product Selector -->
+                        <!-- Searchable Select2 Catalog Product Selector -->
             <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 space-y-2">
-                <div class="flex items-center justify-between">
-                    <label class="block text-xs font-black text-amber-400 uppercase tracking-wide flex items-center space-x-1.5">
-                        <span>⚡ Auto-Fill From Catalog Product</span>
-                    </label>
-                    <span class="text-[10px] text-amber-300 font-mono" id="add_flash_count_badge"><?= count($products_list) ?> products</span>
-                </div>
-                <!-- Live Search Box -->
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">🔍</span>
-                    <input type="text" id="add_flash_search" oninput="filterProductPicker(this, 'add_flash_product_picker', 'add_flash_count_badge')" placeholder="Type to filter products by name, SKU or slug..." class="w-full pl-8 pr-8 py-2 rounded-xl bg-slate-900 border border-amber-500/30 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-amber-400">
-                    <button type="button" onclick="clearProductPickerSearch('add_flash_search', 'add_flash_product_picker', 'add_flash_count_badge')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-white text-xs" title="Clear search">&times;</button>
-                </div>
-                <!-- Filterable Select List -->
-                <select id="add_flash_product_picker" size="4" class="w-full px-2 py-1.5 rounded-xl input-app border border-app text-app-title text-xs font-medium cursor-pointer overflow-y-auto" onchange="onFlashSaleProductSelect(this, 'add')">
-                    <option value="" class="py-1 text-slate-400">-- Choose Existing Product (Optional) --</option>
+                <label class="block text-xs font-black text-amber-500 dark:text-amber-400 uppercase tracking-wide flex items-center space-x-1.5">
+                    <span>⚡ Auto-Fill From Catalog Product</span>
+                </label>
+                <select id="add_flash_product_picker" class="cms-product-select2 w-full" data-modal="#add-flash-sale-modal" data-placeholder="-- Choose Existing Product (Optional) --" onchange="onFlashSaleProductSelect(this, 'add')">
+                    <option value="">-- Choose Existing Product (Optional) --</option>
                     <?php foreach ($products_list as $prod): ?>
                     <option value="<?= $prod['id'] ?>" 
                             data-name="<?= e($prod['name']) ?>" 
@@ -1641,15 +1573,12 @@ $products_list = $stmtProducts->fetchAll();
                             data-badge="<?= e($prod['badge_text']) ?>" 
                             data-image="<?= e($prod['main_image']) ?>"
                             data-price="<?= $prod['price'] ?? 0 ?>"
-                            data-orig="<?= $prod['original_price'] ?? 0 ?>"
-                            class="py-1.5 px-2 hover:bg-amber-600/30 rounded cursor-pointer">
-                        <?= e($prod['name']) ?> (<?= !empty($prod['sku']) ? e($prod['sku']).' • ' : '' ?>slug: <?= e($prod['slug']) ?>)
+                            data-orig="<?= $prod['original_price'] ?? 0 ?>">
+                        <?= e($prod['name']) ?> <?= !empty($prod['sku']) ? '(' . e($prod['sku']) . ')' : '' ?> &bull; slug: <?= e($prod['slug']) ?>
                     </option>
                     <?php endforeach; ?>
                 </select>
-                <div class="flex items-center justify-between text-[10.5px] text-amber-300/80">
-                    <span>Click any product above to auto-populate title, slug link &amp; details</span>
-                </div>
+                <div class="text-[10.5px] text-amber-500/80 dark:text-amber-300/80">Type in dropdown to search by title, SKU, or slug to auto-populate</div>
             </div>
 
             <!-- Title & Ribbons -->
@@ -1721,7 +1650,7 @@ $products_list = $stmtProducts->fetchAll();
             </div>
 
             <div class="p-4 px-6 border-t border-app bg-app-card/95 flex justify-end space-x-2 shrink-0">
-                <button type="button" onclick="closeCmsModal('add-flash-sale-modal')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-app-body text-xs font-bold">Cancel</button>
+                <button type="button" onclick="closeCmsModal('')" class="px-4 py-2 rounded-xl bg-slate-500/15 hover:bg-slate-500/25 text-app-title border border-app text-xs font-semibold cursor-pointer transition-colors">Cancel</button>
                 <button type="submit" class="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-lg">Save Flash Deal</button>
             </div>
         </form>
@@ -1731,14 +1660,14 @@ $products_list = $stmtProducts->fetchAll();
 <!-- ===================================================================== -->
 <!-- 8. EDIT FLASH SALE MODAL -->
 <!-- ===================================================================== -->
-<div id="edit-flash-sale-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex justify-center items-start">
+<div id="edit-flash-sale-modal" style="display: none;" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 justify-center items-start">
     <div class="bg-app-card border border-app rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col my-auto sm:my-8 shadow-2xl relative overflow-hidden">
         <div class="p-5 sm:p-6 pb-3.5 border-b border-app flex items-center justify-between shrink-0">
             <div>
                 <h3 class="text-base font-black text-app-title brand-font">Edit Flash Sale Deal</h3>
                 <p class="text-xs text-app-muted">Update card details, price, discount or banner image</p>
             </div>
-            <button type="button" onclick="closeCmsModal('edit-flash-sale-modal')" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-app-muted hover:text-white flex items-center justify-center text-lg transition-colors">&times;</button>
+            <button type="button" onclick="closeCmsModal('')" class="w-8 h-8 rounded-full bg-slate-500/15 hover:bg-red-500/20 text-app-muted hover:text-red-500 flex items-center justify-center transition-all cursor-pointer border border-app shadow-sm" title="Close dialog"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
 
         <form method="POST" action="cms.php?tab=flash_sale" enctype="multipart/form-data" class="flex-1 flex flex-col min-h-0 overflow-hidden">
@@ -1747,23 +1676,13 @@ $products_list = $stmtProducts->fetchAll();
             <input type="hidden" name="action" value="edit_flash_sale">
             <input type="hidden" id="edit_flash_id" name="id" value="">
 
-            <!-- Searchable Catalog Product Selector -->
+                        <!-- Searchable Select2 Catalog Product Selector -->
             <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 space-y-2">
-                <div class="flex items-center justify-between">
-                    <label class="block text-xs font-black text-amber-400 uppercase tracking-wide flex items-center space-x-1.5">
-                        <span>⚡ Link to Catalog Product (Auto-updates Slug & Details)</span>
-                    </label>
-                    <span class="text-[10px] text-amber-300 font-mono" id="edit_flash_count_badge"><?= count($products_list) ?> products</span>
-                </div>
-                <!-- Live Search Box -->
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">🔍</span>
-                    <input type="text" id="edit_flash_search" oninput="filterProductPicker(this, 'edit_flash_product_picker', 'edit_flash_count_badge')" placeholder="Type to filter products by name, SKU or slug..." class="w-full pl-8 pr-8 py-2 rounded-xl bg-slate-900 border border-amber-500/30 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-amber-400">
-                    <button type="button" onclick="clearProductPickerSearch('edit_flash_search', 'edit_flash_product_picker', 'edit_flash_count_badge')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-white text-xs" title="Clear search">&times;</button>
-                </div>
-                <!-- Filterable Select List -->
-                <select id="edit_flash_product_picker" size="4" class="w-full px-2 py-1.5 rounded-xl input-app border border-app text-app-title text-xs font-medium cursor-pointer overflow-y-auto" onchange="onFlashSaleProductSelect(this, 'edit')">
-                    <option value="" class="py-1 text-slate-400">-- Keep Existing / Custom URL --</option>
+                <label class="block text-xs font-black text-amber-500 dark:text-amber-400 uppercase tracking-wide flex items-center space-x-1.5">
+                    <span>⚡ Link to Catalog Product (Auto-updates Slug &amp; Details)</span>
+                </label>
+                <select id="edit_flash_product_picker" class="cms-product-select2 w-full" data-modal="#edit-flash-sale-modal" data-placeholder="-- Keep Existing / Custom URL --" onchange="onFlashSaleProductSelect(this, 'edit')">
+                    <option value="">-- Keep Existing / Custom URL --</option>
                     <?php foreach ($products_list as $prod): ?>
                     <option value="<?= $prod['id'] ?>" 
                             data-name="<?= e($prod['name']) ?>" 
@@ -1772,15 +1691,12 @@ $products_list = $stmtProducts->fetchAll();
                             data-badge="<?= e($prod['badge_text']) ?>" 
                             data-image="<?= e($prod['main_image']) ?>"
                             data-price="<?= $prod['price'] ?? 0 ?>"
-                            data-orig="<?= $prod['original_price'] ?? 0 ?>"
-                            class="py-1.5 px-2 hover:bg-amber-600/30 rounded cursor-pointer">
-                        <?= e($prod['name']) ?> (<?= !empty($prod['sku']) ? e($prod['sku']).' • ' : '' ?>slug: <?= e($prod['slug']) ?>)
+                            data-orig="<?= $prod['original_price'] ?? 0 ?>">
+                        <?= e($prod['name']) ?> <?= !empty($prod['sku']) ? '(' . e($prod['sku']) . ')' : '' ?> &bull; slug: <?= e($prod['slug']) ?>
                     </option>
                     <?php endforeach; ?>
                 </select>
-                <div class="flex items-center justify-between text-[10.5px] text-amber-300/80">
-                    <span>Click any product above to auto-populate title, slug link &amp; details</span>
-                </div>
+                <div class="text-[10.5px] text-amber-500/80 dark:text-amber-300/80">Type in dropdown to search by title, SKU, or slug to auto-populate</div>
             </div>
 
             <!-- Title & Swatch -->
@@ -1852,7 +1768,7 @@ $products_list = $stmtProducts->fetchAll();
             </div>
 
             <div class="p-4 px-6 border-t border-app bg-app-card/95 flex justify-end space-x-2 shrink-0">
-                <button type="button" onclick="closeCmsModal('edit-flash-sale-modal')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-app-body text-xs font-bold">Cancel</button>
+                <button type="button" onclick="closeCmsModal('')" class="px-4 py-2 rounded-xl bg-slate-500/15 hover:bg-slate-500/25 text-app-title border border-app text-xs font-semibold cursor-pointer transition-colors">Cancel</button>
                 <button type="submit" class="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-lg">Update Flash Deal</button>
             </div>
         </form>
@@ -1861,19 +1777,45 @@ $products_list = $stmtProducts->fetchAll();
 
 <script>
 
-    // Global modal closer
+        // Global modal openers and closers
+    function openCmsModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        modal.style.display = 'flex';
+
+        // Auto initialize or re-sync Select2 on product pickers inside this modal
+        setTimeout(function() {
+            if (typeof jQuery !== 'undefined' && typeof jQuery.fn.select2 !== 'undefined') {
+                $('#' + modalId + ' .cms-product-select2').each(function() {
+                    const $sel = $(this);
+                    if (!$sel.hasClass('select2-hidden-accessible')) {
+                        $sel.select2({
+                            width: '100%',
+                            dropdownParent: $('#' + modalId),
+                            placeholder: $sel.data('placeholder') || '-- Choose Existing Product (Optional) --',
+                            allowClear: true
+                        });
+                    }
+                });
+            }
+        }, 50);
+    }
+
     function closeCmsModal(modalId) {
         const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.classList.add('hidden');
-        }
+        if (!modal) return;
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        modal.style.display = 'none';
     }
 
     // Close modal on Escape key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-            document.querySelectorAll('[id$="-modal"]:not(.hidden)').forEach(function(m) {
-                m.classList.add('hidden');
+            document.querySelectorAll('[id$="-modal"]').forEach(function(m) {
+                closeCmsModal(m.id);
             });
         }
     });
@@ -1883,7 +1825,7 @@ $products_list = $stmtProducts->fetchAll();
         document.querySelectorAll('[id$="-modal"]').forEach(function(modal) {
             modal.addEventListener('click', function(e) {
                 if (e.target === modal) {
-                    modal.classList.add('hidden');
+                    closeCmsModal(modal.id);
                 }
             });
         });
@@ -2063,13 +2005,14 @@ $products_list = $stmtProducts->fetchAll();
                 const optSlug = opt.getAttribute('data-slug');
                 if (optSlug && (slide.cta_link || '').includes('slug=' + optSlug)) {
                     picker.selectedIndex = i;
+                    $(picker).trigger('change.select2');
                     break;
                 }
             }
         }
 
         updateLinkVerification('edit_hero_cta_link', 'edit_hero_cta_link_preview', slide.cta_link || 'explore.php');
-        document.getElementById('edit-hero-modal').classList.remove('hidden');
+        openCmsModal('edit-hero-modal');
     }
 
     function onSpotlightProductSelect(selectEl, mode) {
@@ -2140,7 +2083,7 @@ $products_list = $stmtProducts->fetchAll();
         document.getElementById('edit_spot_sort').value = item.sort_order || 1;
         document.getElementById('edit_spot_active').checked = item.is_active == 1;
         updateLinkVerification('edit_spot_link', 'edit_spot_link_preview', item.link_url || 'product-detail.php');
-        document.getElementById('edit-spotlight-modal').classList.remove('hidden');
+        openCmsModal('edit-spotlight-modal');
     }
 
     function calcNewArrivalDiscount(mode) {
@@ -2221,7 +2164,7 @@ $products_list = $stmtProducts->fetchAll();
         }
 
         updateLinkVerification('edit_arr_link', 'edit_arr_link_preview', item.link_url || 'product-detail.php');
-        document.getElementById('edit-new-arrival-modal').classList.remove('hidden');
+        openCmsModal('edit-new-arrival-modal');
     }
 
     function onFlashSaleProductSelect(selectEl, mode) {
@@ -2292,7 +2235,7 @@ $products_list = $stmtProducts->fetchAll();
         }
 
         updateLinkVerification('edit_flash_link', 'edit_flash_link_preview', item.link_url || 'product-detail.php');
-        document.getElementById('edit-flash-sale-modal').classList.remove('hidden');
+        openCmsModal('edit-flash-sale-modal');
     }
 
     // Initialize verification links on page load for add modals

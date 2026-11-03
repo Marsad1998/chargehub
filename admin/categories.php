@@ -130,13 +130,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch all categories with product count
+// Count total categories for pagination
+$totalCats = (int)$pdo->query("SELECT COUNT(*) FROM categories")->fetchColumn();
+$per_page = 15;
+$page = max(1, (int)($_GET['page'] ?? 1));
+$total_pages = max(1, (int)ceil($totalCats / $per_page));
+if ($page > $total_pages && $totalCats > 0) $page = $total_pages;
+$offset = ($page - 1) * $per_page;
+
+// Fetch categories with product count
 $stmtCats = $pdo->prepare("
     SELECT c.*, COUNT(p.id) AS product_count 
     FROM categories c 
     LEFT JOIN products p ON c.id = p.category_id 
     GROUP BY c.id 
     ORDER BY c.sort_order ASC, c.id ASC
+    LIMIT $per_page OFFSET $offset
 ");
 $stmtCats->execute();
 $categories = $stmtCats->fetchAll();
@@ -289,6 +298,9 @@ $flashMessages = get_flash_messages();
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination Component -->
+            <?= render_admin_pagination($totalCats, $per_page, $page) ?>
         </div>
 
     </main>
@@ -296,14 +308,16 @@ $flashMessages = get_flash_messages();
 </div>
 
 <!-- ADD CATEGORY MODAL -->
-<div id="add-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+<div id="add-modal" style="display: none;" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-app-card border border-app rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
         <div class="flex items-center justify-between pb-3 border-b border-app">
             <h3 class="text-sm font-black text-app-title uppercase tracking-wider flex items-center space-x-1.5">
                 <span>➕</span>
                 <span>Add New Category</span>
             </h3>
-            <button onclick="closeAddModal()" class="text-app-muted hover:text-app-title text-base">&times;</button>
+            <button onclick="closeAddModal()" class="w-7 h-7 rounded-full bg-slate-500/15 hover:bg-red-500/20 text-app-muted hover:text-red-500 flex items-center justify-center transition-all cursor-pointer border border-app shadow-sm" title="Close dialog">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
         </div>
 
         <form method="POST" enctype="multipart/form-data" class="space-y-3">
@@ -377,14 +391,16 @@ $flashMessages = get_flash_messages();
 </div>
 
 <!-- EDIT CATEGORY MODAL -->
-<div id="edit-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+<div id="edit-modal" style="display: none;" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-app-card border border-app rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
         <div class="flex items-center justify-between pb-3 border-b border-app">
             <h3 class="text-sm font-black text-app-title uppercase tracking-wider flex items-center space-x-1.5">
                 <span>✏️</span>
                 <span>Edit Category</span>
             </h3>
-            <button onclick="closeEditModal()" class="text-app-muted hover:text-app-title text-base">&times;</button>
+            <button onclick="closeEditModal()" class="w-7 h-7 rounded-full bg-slate-500/15 hover:bg-red-500/20 text-app-muted hover:text-red-500 flex items-center justify-center transition-all cursor-pointer border border-app shadow-sm" title="Close dialog">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
         </div>
 
         <form method="POST" enctype="multipart/form-data" class="space-y-3">
@@ -469,10 +485,20 @@ $flashMessages = get_flash_messages();
 
 <script>
     function openAddModal() {
-        document.getElementById('add-modal').classList.remove('hidden');
+        const m = document.getElementById('add-modal');
+        if (m) {
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+            m.style.display = 'flex';
+        }
     }
     function closeAddModal() {
-        document.getElementById('add-modal').classList.add('hidden');
+        const m = document.getElementById('add-modal');
+        if (m) {
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+            m.style.display = 'none';
+        }
     }
 
     function openEditModal(cat) {
@@ -511,11 +537,41 @@ $flashMessages = get_flash_messages();
             label.textContent = 'No icon/image set';
         }
 
-        document.getElementById('edit-modal').classList.remove('hidden');
+        const m = document.getElementById('edit-modal');
+        if (m) {
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+            m.style.display = 'flex';
+        }
     }
     function closeEditModal() {
-        document.getElementById('edit-modal').classList.add('hidden');
+        const m = document.getElementById('edit-modal');
+        if (m) {
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+            m.style.display = 'none';
+        }
     }
+
+    // Close on Escape or click outside
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeAddModal();
+            closeEditModal();
+        }
+    });
+
+    ['add-modal', 'edit-modal'].forEach(function(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    if (id === 'add-modal') closeAddModal();
+                    else closeEditModal();
+                }
+            });
+        }
+    });
 </script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

@@ -92,6 +92,20 @@ try {
                 </div>
             </a>
 
+            <!-- SECTION: SETTINGS & SYSTEM -->
+            <div class="pt-3 pb-1 px-3">
+                <span class="text-[9.5px] font-black uppercase tracking-widest text-app-muted opacity-70">Settings &amp; System</span>
+            </div>
+
+            <!-- Email & SMTP Settings Link -->
+            <a href="settings-email.php" class="flex items-center justify-between px-3 py-2 rounded-xl transition-all <?= ($current_file === 'settings-email.php') ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30 font-bold' : 'text-app-muted hover:text-app-title hover:bg-slate-500/10' ?>">
+                <div class="flex items-center space-x-2.5">
+                    <span class="text-sm">✉️</span>
+                    <span>Email &amp; SMTP</span>
+                </div>
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full <?= ($current_file === 'settings-email.php') ? 'bg-white/20 text-white' : 'bg-slate-500/15 text-app-muted' ?>">Setup</span>
+            </a>
+
             <!-- SECTION: STORE FRONT (The only website link) -->
             <div class="pt-3 pb-1 px-3">
                 <span class="text-[9.5px] font-black uppercase tracking-widest text-app-muted opacity-70">Storefront</span>

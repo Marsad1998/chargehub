@@ -61,6 +61,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
         }
+
+        // 4. RESEND ORDER CONFIRMATION EMAIL
+        elseif ($action === 'resend_email') {
+            $order_id = (int)($_POST['order_id'] ?? 0);
+            if ($order_id > 0) {
+                require_once __DIR__ . '/../includes/mailer.php';
+                $mRes = send_order_confirmation_email($order_id);
+                if (!empty($mRes['success'])) {
+                    set_flash_message('success', 'Order confirmation email sent successfully!');
+                } else {
+                    set_flash_message('error', 'Failed to send email: ' . ($mRes['message'] ?? $mRes['error'] ?? 'Check SMTP settings in Email & SMTP Settings'));
+                }
+                header('Location: orders.php');
+                exit;
+            }
+        }
     }
 }
 
@@ -107,11 +123,12 @@ $filter_status = trim($_GET['status'] ?? '');
 $filter_city = trim($_GET['city'] ?? '');
 $filter_date = trim($_GET['date_range'] ?? '');
 
-$sql = "SELECT * FROM orders WHERE 1=1";
+// Count total filtered orders for pagination
+$countSql = "SELECT COUNT(*) FROM orders WHERE 1=1";
 $params = [];
 
 if (!empty($search)) {
-    $sql .= " AND (order_number LIKE ? OR customer_name LIKE ? OR customer_phone LIKE ? OR customer_address LIKE ?)";
+    $countSql .= " AND (order_number LIKE ? OR customer_name LIKE ? OR customer_phone LIKE ? OR customer_address LIKE ?)";
     $params[] = "%$search%";
     $params[] = "%$search%";
     $params[] = "%$search%";
@@ -119,13 +136,53 @@ if (!empty($search)) {
 }
 
 if (!empty($filter_status)) {
-    $sql .= " AND status = ?";
+    $countSql .= " AND status = ?";
     $params[] = $filter_status;
 }
 
 if (!empty($filter_city)) {
-    $sql .= " AND customer_city = ?";
+    $countSql .= " AND customer_city = ?";
     $params[] = $filter_city;
+}
+
+if ($filter_date === 'today') {
+    $countSql .= " AND DATE(created_at) = CURDATE()";
+} elseif ($filter_date === 'week') {
+    $countSql .= " AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
+} elseif ($filter_date === 'month') {
+    $countSql .= " AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+}
+
+$stmtCount = $pdo->prepare($countSql);
+$stmtCount->execute($params);
+$totalFilteredOrders = (int)$stmtCount->fetchColumn();
+
+// Pagination Parameters (15 orders per page)
+$per_page = 15;
+$page = max(1, (int)($_GET['page'] ?? 1));
+$total_pages = max(1, (int)ceil($totalFilteredOrders / $per_page));
+if ($page > $total_pages && $totalFilteredOrders > 0) $page = $total_pages;
+$offset = ($page - 1) * $per_page;
+
+$sql = "SELECT * FROM orders WHERE 1=1";
+$queryParams = [];
+
+if (!empty($search)) {
+    $sql .= " AND (order_number LIKE ? OR customer_name LIKE ? OR customer_phone LIKE ? OR customer_address LIKE ?)";
+    $queryParams[] = "%$search%";
+    $queryParams[] = "%$search%";
+    $queryParams[] = "%$search%";
+    $queryParams[] = "%$search%";
+}
+
+if (!empty($filter_status)) {
+    $sql .= " AND status = ?";
+    $queryParams[] = $filter_status;
+}
+
+if (!empty($filter_city)) {
+    $sql .= " AND customer_city = ?";
+    $queryParams[] = $filter_city;
 }
 
 if ($filter_date === 'today') {
@@ -136,10 +193,10 @@ if ($filter_date === 'today') {
     $sql .= " AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
 }
 
-$sql .= " ORDER BY id DESC";
+$sql .= " ORDER BY id DESC LIMIT $per_page OFFSET $offset";
 
 $stmtOrders = $pdo->prepare($sql);
-$stmtOrders->execute($params);
+$stmtOrders->execute($queryParams);
 $orders = $stmtOrders->fetchAll(PDO::FETCH_ASSOC);
 
 // Unique cities for city dropdown
@@ -449,6 +506,9 @@ try {
                     </table>
                 </div>
 
+                <!-- Pagination Component -->
+                <?= render_admin_pagination($totalFilteredOrders, $per_page, $page) ?>
+
             </form>
 
         </div>
@@ -460,7 +520,7 @@ try {
 <!-- ===================================================================== -->
 <!-- ORDER DETAILS & PACKING SLIP MODAL -->
 <!-- ===================================================================== -->
-<div id="order-details-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex justify-center items-start">
+<div id="order-details-modal" style="display: none;" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 justify-center items-start">
     <div class="bg-app-card border border-app rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col my-auto sm:my-8 shadow-2xl relative overflow-hidden">
         
         <!-- Modal Header -->
@@ -472,7 +532,9 @@ try {
                 </h3>
                 <p id="modal-order-date" class="text-xs text-app-muted mt-0.5">Date &bull; Time</p>
             </div>
-            <button type="button" onclick="closeOrderModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-app-muted hover:text-white flex items-center justify-center text-lg transition-colors cursor-pointer">&times;</button>
+            <button type="button" onclick="closeOrderModal()" class="w-8 h-8 rounded-full bg-slate-500/15 hover:bg-red-500/20 text-app-muted hover:text-red-500 flex items-center justify-center transition-all cursor-pointer border border-app shadow-sm" title="Close dialog">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
         </div>
 
         <!-- Modal Body -->
@@ -489,7 +551,17 @@ try {
                             WhatsApp Chat
                         </a>
                     </div>
-                    <div id="modal-cust-email" class="text-app-muted mt-0.5">email@example.com</div>
+                    <div class="flex items-center space-x-2 mt-1">
+                        <span id="modal-cust-email" class="text-app-muted">email@example.com</span>
+                        <form id="resend-email-form" method="POST" action="orders.php" class="inline">
+                            <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
+                            <input type="hidden" name="action" value="resend_email">
+                            <input type="hidden" name="order_id" id="resend-email-order-id" value="">
+                            <button type="submit" id="modal-resend-email-btn" title="Send or resend order confirmation email via SMTP" class="hidden px-2 py-0.5 rounded bg-blue-500/15 text-blue-500 hover:bg-blue-500/25 font-bold text-[10px] transition-colors cursor-pointer">
+                                ✉️ Resend Confirmation Email
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
                 <div>
@@ -651,7 +723,18 @@ try {
         // Customer details
         document.getElementById('modal-cust-name').textContent = order.customer_name;
         document.getElementById('modal-cust-phone').textContent = order.customer_phone;
-        document.getElementById('modal-cust-email').textContent = order.customer_email || 'No email provided';
+        const emailEl = document.getElementById('modal-cust-email');
+        const resendBtn = document.getElementById('modal-resend-email-btn');
+        if (order.customer_email && order.customer_email.trim()) {
+            emailEl.textContent = order.customer_email;
+            if (resendBtn) {
+                resendBtn.classList.remove('hidden');
+                document.getElementById('resend-email-order-id').value = order.id;
+            }
+        } else {
+            emailEl.textContent = 'No email provided';
+            if (resendBtn) resendBtn.classList.add('hidden');
+        }
         document.getElementById('modal-cust-city').textContent = order.customer_city;
         document.getElementById('modal-cust-address').textContent = order.customer_address;
         
@@ -720,22 +803,42 @@ try {
             discountRow.classList.add('hidden');
         }
 
-        document.getElementById('order-details-modal').classList.remove('hidden');
+        const m = document.getElementById('order-details-modal');
+        if (m) {
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+            m.style.display = 'flex';
+        }
     }
 
     function closeOrderModal() {
-        document.getElementById('order-details-modal').classList.add('hidden');
+        const m = document.getElementById('order-details-modal');
+        if (m) {
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+            m.style.display = 'none';
+        }
     }
 
     // Delete Modal
     function openDeleteOrderModal(id, num) {
         document.getElementById('delete-order-id-input').value = id;
         document.getElementById('delete-order-num-text').textContent = num;
-        document.getElementById('delete-order-modal').classList.remove('hidden');
+        const m = document.getElementById('delete-order-modal');
+        if (m) {
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+            m.style.display = 'flex';
+        }
     }
 
     function closeDeleteOrderModal() {
-        document.getElementById('delete-order-modal').classList.add('hidden');
+        const m = document.getElementById('delete-order-modal');
+        if (m) {
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+            m.style.display = 'none';
+        }
     }
 
     // Print Packing Slip

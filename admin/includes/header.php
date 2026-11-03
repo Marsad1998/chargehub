@@ -22,6 +22,83 @@ if (!str_ends_with($admin_base_url, '/admin/')) {
         $admin_base_url = rtrim($m[1], '/') . '/';
     }
 }
+// 3. Global Reusable Admin Pagination Component
+if (!function_exists('render_admin_pagination')) {
+    function render_admin_pagination($total_items, $per_page, $current_page) {
+        $total_pages = max(1, (int)ceil($total_items / $per_page));
+        if ($total_items === 0) return '';
+        
+        $start_item = (($current_page - 1) * $per_page) + 1;
+        $end_item = min($current_page * $per_page, $total_items);
+        
+        $build_url = function($page_num) {
+            $p = $_GET;
+            $p['page'] = $page_num;
+            return '?' . http_build_query($p);
+        };
+
+        ob_start();
+        ?>
+        <div class="px-4 py-3 bg-app-card border-t border-app flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <div class="text-app-muted font-medium">
+                Showing <strong class="text-app-title"><?= $start_item ?></strong> to <strong class="text-app-title"><?= $end_item ?></strong> of <strong class="text-app-title"><?= number_format($total_items) ?></strong> entries
+            </div>
+            <?php if ($total_pages > 1): ?>
+            <div class="flex items-center space-x-1">
+                <!-- Previous Button -->
+                <?php if ($current_page > 1): ?>
+                    <a href="<?= e($build_url($current_page - 1)) ?>" class="px-2.5 sm:px-3 py-1.5 rounded-lg input-app border border-app text-app-title hover:bg-slate-500/10 transition-colors font-semibold flex items-center space-x-1 cursor-pointer">
+                        <span>&larr;</span>
+                        <span class="hidden sm:inline">Prev</span>
+                    </a>
+                <?php else: ?>
+                    <span class="px-2.5 sm:px-3 py-1.5 rounded-lg border border-app/50 text-app-muted/50 font-semibold cursor-not-allowed">
+                        <span>&larr;</span>
+                        <span class="hidden sm:inline">Prev</span>
+                    </span>
+                <?php endif; ?>
+
+                <!-- Page Number Pills (Windowed around current) -->
+                <?php
+                $start_p = max(1, $current_page - 2);
+                $end_p = min($total_pages, $current_page + 2);
+                if ($start_p > 1): ?>
+                    <a href="<?= e($build_url(1)) ?>" class="w-8 h-8 rounded-lg input-app border border-app text-app-title hover:bg-slate-500/10 flex items-center justify-center font-bold">1</a>
+                    <?php if ($start_p > 2): ?><span class="px-1 text-app-muted">...</span><?php endif; ?>
+                <?php endif; ?>
+
+                <?php for ($p = $start_p; $p <= $end_p; $p++): ?>
+                    <?php if ($p == $current_page): ?>
+                        <span class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black shadow-sm"><?= $p ?></span>
+                    <?php else: ?>
+                        <a href="<?= e($build_url($p)) ?>" class="w-8 h-8 rounded-lg input-app border border-app text-app-title hover:bg-slate-500/10 flex items-center justify-center font-bold transition-colors"><?= $p ?></a>
+                    <?php endif; ?>
+                <?php endfor; ?>
+
+                <?php if ($end_p < $total_pages): ?>
+                    <?php if ($end_p < $total_pages - 1): ?><span class="px-1 text-app-muted">...</span><?php endif; ?>
+                    <a href="<?= e($build_url($total_pages)) ?>" class="w-8 h-8 rounded-lg input-app border border-app text-app-title hover:bg-slate-500/10 flex items-center justify-center font-bold"><?= $total_pages ?></a>
+                <?php endif; ?>
+
+                <!-- Next Button -->
+                <?php if ($current_page < $total_pages): ?>
+                    <a href="<?= e($build_url($current_page + 1)) ?>" class="px-2.5 sm:px-3 py-1.5 rounded-lg input-app border border-app text-app-title hover:bg-slate-500/10 transition-colors font-semibold flex items-center space-x-1 cursor-pointer">
+                        <span class="hidden sm:inline">Next</span>
+                        <span>&rarr;</span>
+                    </a>
+                <?php else: ?>
+                    <span class="px-2.5 sm:px-3 py-1.5 rounded-lg border border-app/50 text-app-muted/50 font-semibold cursor-not-allowed">
+                        <span class="hidden sm:inline">Next</span>
+                        <span>&rarr;</span>
+                    </span>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en" class="theme-dark">
@@ -49,6 +126,11 @@ if (!str_ends_with($admin_base_url, '/admin/')) {
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Cabinet+Grotesk:wght@700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- jQuery & Select2 -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -113,9 +195,85 @@ if (!str_ends_with($admin_base_url, '/admin/')) {
             border-color: #2563eb;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
         }
-        select.input-app, select.input-app option, select option {
-            background-color: var(--app-input-bg);
-            color: var(--app-text-title);
+        select, select.input-app, select option {
+            background-color: var(--app-input-bg) !important;
+            color: var(--app-text-title) !important;
+        }
+
+        /* Modern Select2 Theme Integration */
+        .select2-container {
+            width: 100% !important;
+        }
+        .select2-container--default .select2-selection--single {
+            background-color: var(--app-input-bg) !important;
+            border: 1px solid var(--app-input-border) !important;
+            border-radius: 0.5rem !important;
+            height: 42px !important;
+            display: flex !important;
+            align-items: center !important;
+            transition: all 0.15s ease-in-out;
+        }
+        .select2-container--default.select2-container--focus .select2-selection--single,
+        .select2-container--default.select2-container--open .select2-selection--single {
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2) !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: var(--app-text-title) !important;
+            line-height: 40px !important;
+            padding-left: 12px !important;
+            padding-right: 28px !important;
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__placeholder {
+            color: var(--app-text-muted) !important;
+            font-weight: 400 !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 40px !important;
+            right: 8px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow b {
+            border-color: var(--app-text-muted) transparent transparent transparent !important;
+        }
+        .select2-dropdown {
+            background-color: var(--app-card-bg) !important;
+            border: 1px solid var(--app-card-border) !important;
+            border-radius: 0.5rem !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3) !important;
+            overflow: hidden !important;
+            z-index: 99999 !important;
+        }
+        .select2-search--dropdown {
+            padding: 8px !important;
+            background-color: var(--app-card-bg) !important;
+            border-bottom: 1px solid var(--app-card-border) !important;
+        }
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            background-color: var(--app-input-bg) !important;
+            border: 1px solid var(--app-input-border) !important;
+            border-radius: 0.375rem !important;
+            color: var(--app-text-title) !important;
+            padding: 8px 12px !important;
+            outline: none !important;
+            font-size: 0.875rem !important;
+            width: 100% !important;
+        }
+        .select2-container--default .select2-results__option {
+            color: var(--app-text-body) !important;
+            padding: 9px 12px !important;
+            font-size: 0.875rem !important;
+            transition: background 0.1s ease;
+        }
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #2563eb !important;
+            color: #ffffff !important;
+        }
+        .select2-container--default .select2-results__option[aria-selected="true"] {
+            background-color: rgba(37, 99, 235, 0.15) !important;
+            color: var(--app-text-title) !important;
+            font-weight: 600 !important;
         }
 
         /* High contrast light mode helper overrides */

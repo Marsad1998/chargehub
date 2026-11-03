@@ -76,6 +76,10 @@
                     <input type="tel" id="order_cust_phone" required placeholder="0300 1234567" class="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 focus:outline-none focus:border-brand-blue">
                 </div>
                 <div>
+                    <label class="block font-bold text-gray-700 mb-0.5">Email Address (Optional)</label>
+                    <input type="email" id="order_cust_email" placeholder="saad@example.com (for order receipt)" class="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 focus:outline-none focus:border-brand-blue">
+                </div>
+                <div>
                     <label class="block font-bold text-gray-700 mb-0.5">Delivery Address *</label>
                     <textarea id="order_cust_address" required rows="2" placeholder="House/Flat number, Street, Area" class="w-full px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 focus:outline-none focus:border-brand-blue"></textarea>
                 </div>
@@ -374,6 +378,7 @@
 
         const name = document.getElementById('order_cust_name').value.trim();
         const phone = document.getElementById('order_cust_phone').value.trim();
+        const email = document.getElementById('order_cust_email') ? document.getElementById('order_cust_email').value.trim() : '';
         const address = document.getElementById('order_cust_address').value.trim();
         const city = document.getElementById('order_cust_city').value.trim();
         const submitBtn = document.getElementById('order-submit-btn');
@@ -397,6 +402,7 @@
                 body: JSON.stringify({
                     customer_name: name,
                     customer_phone: phone,
+                    customer_email: email,
                     customer_address: address,
                     customer_city: city,
                     items: cart,

@@ -72,6 +72,12 @@ $recentProducts = $stmtRecent->fetchAll();
                     <span>➕</span>
                     <span>Add Product</span>
                 </a>
+                <a href="orders.php" class="px-3 py-2 rounded-xl bg-app-card border border-app hover:bg-slate-500/10 text-app-title text-xs font-semibold transition-all">
+                    <span>📦 Orders</span>
+                </a>
+                <a href="settings-email.php" class="px-3 py-2 rounded-xl bg-app-card border border-app hover:bg-slate-500/10 text-app-title text-xs font-semibold transition-all">
+                    <span>✉️ Email &amp; SMTP</span>
+                </a>
                 <a href="cms.php" class="px-3 py-2 rounded-xl bg-app-card border border-app hover:bg-slate-500/10 text-app-title text-xs font-semibold transition-all">
                     <span>🖼️ CMS Media</span>
                 </a>

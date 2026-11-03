@@ -81,7 +81,35 @@ if ($filter_brand > 0) {
     $params[] = $filter_brand;
 }
 
-$query .= " ORDER BY p.id DESC";
+// Count total products matching filters
+$countQuery = "
+    SELECT COUNT(*) 
+    FROM products p 
+    LEFT JOIN categories c ON p.category_id = c.id 
+    LEFT JOIN brands b ON p.brand_id = b.id 
+    WHERE 1=1
+";
+if (!empty($search)) {
+    $countQuery .= " AND (p.name LIKE ? OR p.sku LIKE ? OR p.slug LIKE ?)";
+}
+if ($filter_cat > 0) {
+    $countQuery .= " AND p.category_id = ?";
+}
+if ($filter_brand > 0) {
+    $countQuery .= " AND p.brand_id = ?";
+}
+$stmtCount = $pdo->prepare($countQuery);
+$stmtCount->execute($params);
+$totalProducts = (int)$stmtCount->fetchColumn();
+
+// Pagination params (15 products per page)
+$per_page = 15;
+$page = max(1, (int)($_GET['page'] ?? 1));
+$total_pages = max(1, (int)ceil($totalProducts / $per_page));
+if ($page > $total_pages && $totalProducts > 0) $page = $total_pages;
+$offset = ($page - 1) * $per_page;
+
+$query .= " ORDER BY p.id DESC LIMIT $per_page OFFSET $offset";
 $stmtProds = $pdo->prepare($query);
 $stmtProds->execute($params);
 $products = $stmtProds->fetchAll();
@@ -162,7 +190,7 @@ $flashMessages = get_flash_messages();
             </form>
 
             <span class="text-xs text-app-muted shrink-0">
-                Found: <strong class="text-app-title"><?= count($products) ?></strong> product(s)
+                Found: <strong class="text-app-title"><?= number_format($totalProducts) ?></strong> product(s)
             </span>
         </div>
 
@@ -279,6 +307,9 @@ $flashMessages = get_flash_messages();
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination Component -->
+            <?= render_admin_pagination($totalProducts, $per_page, $page) ?>
         </div>
 
     </main>

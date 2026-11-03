@@ -88,12 +88,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 'order_number' => $order_number,
                 'customer_name' => $cust_name,
                 'customer_phone' => $cust_phone,
+                'customer_email' => $cust_email,
                 'customer_address' => $cust_address,
                 'customer_city' => $cust_city,
                 'payment_method' => $payment_method,
                 'total_amount' => $total,
                 'items' => json_decode($raw_items, true) ?: []
             ];
+
+            // Send automated order confirmation email to customer
+            if (!empty($cust_email)) {
+                require_once __DIR__ . '/includes/mailer.php';
+                send_order_confirmation_email([
+                    'order_number' => $order_number,
+                    'customer_name' => $cust_name,
+                    'customer_phone' => $cust_phone,
+                    'customer_email' => $cust_email,
+                    'customer_address' => $cust_address,
+                    'customer_city' => $cust_city,
+                    'payment_method' => $payment_method,
+                    'subtotal' => $subtotal,
+                    'total_amount' => $total,
+                    'order_items_json' => $raw_items,
+                    'created_at' => date('Y-m-d H:i:s')
+                ]);
+            }
         } catch (Exception $e) {
             // Fallback order placement confirmation
             $order_number = 'CH-' . rand(10000, 99999);
@@ -102,12 +121,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 'order_number' => $order_number,
                 'customer_name' => $cust_name,
                 'customer_phone' => $cust_phone,
+                'customer_email' => $cust_email,
                 'customer_address' => $cust_address,
                 'customer_city' => $cust_city,
                 'payment_method' => $payment_method,
                 'total_amount' => $total,
                 'items' => json_decode($raw_items, true) ?: []
             ];
+
+            // Send automated order confirmation email to customer
+            if (!empty($cust_email)) {
+                require_once __DIR__ . '/includes/mailer.php';
+                send_order_confirmation_email([
+                    'order_number' => $order_number,
+                    'customer_name' => $cust_name,
+                    'customer_phone' => $cust_phone,
+                    'customer_email' => $cust_email,
+                    'customer_address' => $cust_address,
+                    'customer_city' => $cust_city,
+                    'payment_method' => $payment_method,
+                    'subtotal' => $subtotal,
+                    'total_amount' => $total,
+                    'order_items_json' => $raw_items,
+                    'created_at' => date('Y-m-d H:i:s')
+                ]);
+            }
         }
     }
 }

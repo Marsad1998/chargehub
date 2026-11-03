@@ -30,9 +30,15 @@
         </button>
 
         <!-- Quick Store Front Link -->
-        <a href="../index.php" target="_blank" class="px-3 py-1 rounded-xl bg-slate-500/10 hover:bg-slate-500/20 text-app-title text-xs font-semibold transition-all flex items-center space-x-1">
+        <a href="../index.php" target="_blank" class="px-3 py-1 rounded-xl bg-slate-500/10 hover:bg-slate-500/20 text-app-title text-xs font-semibold transition-all flex items-center space-x-1" title="View Storefront">
             <span>🌐</span>
             <span class="hidden sm:inline text-[11px]">Store</span>
+        </a>
+
+        <!-- Logout Button -->
+        <a href="logout.php" class="px-2.5 sm:px-3 py-1 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 hover:text-red-600 text-xs font-bold transition-all flex items-center space-x-1 border border-red-500/20 shadow-xs" title="Sign out of Admin Portal">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            <span class="text-[11px]">Logout</span>
         </a>
     </div>
 </header>
