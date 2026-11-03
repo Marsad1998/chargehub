@@ -158,8 +158,10 @@
 </div>
 
 <!-- GLOBAL CART SCRIPTS -->
+<?php $waCartConfig = function_exists('get_whatsapp_config') ? get_whatsapp_config() : ['number_clean' => '923001234567']; ?>
 <script>
     const CART_KEY = 'chargehub_cart_v7';
+    const STORE_WHATSAPP_NUMBER = '<?= e($waCartConfig['number_clean']) ?>';
 
     function getCart() {
         try {
@@ -318,7 +320,7 @@
 
         if (whatsappBtn) {
             const waText = encodeURIComponent(`Hi ChargeHub Pakistan, I would like to order the following items from my cart:\n\n${waItemsList.join('\n')}\n\nTotal Amount: Rs. ${subtotal.toLocaleString()}\nDelivery: Free Express (Cash on Delivery)`);
-            whatsappBtn.href = `https://wa.me/923001234567?text=${waText}`;
+            whatsappBtn.href = `https://wa.me/${STORE_WHATSAPP_NUMBER}?text=${waText}`;
         }
     }
 
@@ -419,7 +421,7 @@
 
                 const waItems = cart.map(i => `• ${i.name} (x${i.qty}) - Rs. ${(i.price * i.qty).toLocaleString()}`).join('\n');
                 const waMsg = encodeURIComponent(`Hi ChargeHub! I placed Order #${orderId}\nName: ${name}\nPhone: ${phone}\nCity: ${city}\nAddress: ${address}\n\nItems:\n${waItems}\n\nTotal: Rs. ${subtotal.toLocaleString()} (COD)`);
-                document.getElementById('success-whatsapp-link').href = `https://wa.me/923001234567?text=${waMsg}`;
+                document.getElementById('success-whatsapp-link').href = `https://wa.me/${STORE_WHATSAPP_NUMBER}?text=${waMsg}`;
 
                 clearCart();
 

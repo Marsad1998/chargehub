@@ -480,10 +480,11 @@ function send_order_confirmation_email($orderInput) {
         $itemsHtml = '<tr><td colspan="3" style="padding: 12px; text-align: center; color: #94a3b8;">Standard Gear Order</td></tr>';
     }
 
-    // WhatsApp Direct Link
+    // WhatsApp Direct Link (Dynamic from Site Settings)
+    $waConfigMailer = function_exists('get_whatsapp_config') ? get_whatsapp_config() : ['number_clean' => '923001234567', 'number_raw' => '+92 300 1234567'];
     $waItems = urlencode($itemsText);
     $waMsg = urlencode("Hi ChargeHub! I placed Order #" . $order['order_number'] . ".\nTotal: Rs. " . number_format((float)$order['total_amount']) . "\nPlease confirm dispatch status.");
-    $waLink = "https://wa.me/923001234567?text=" . $waMsg;
+    $waLink = "https://wa.me/" . $waConfigMailer['number_clean'] . "?text=" . $waMsg;
 
     // Placeholder Replacements
     $replacements = [

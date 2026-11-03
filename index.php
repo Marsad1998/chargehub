@@ -1187,8 +1187,12 @@ if (empty($categories)) {
     </section>
 
     <!-- ================================================================= -->
-    <!-- FLOATING WHATSAPP CHAT BUTTON (Matching Screenshot Element) -->
+    <!-- FLOATING WHATSAPP CHAT BUTTON (Dynamic from Dashboard Setup) -->
     <!-- ================================================================= -->
+    <?php 
+    $waHomeConfig = function_exists('get_whatsapp_config') ? get_whatsapp_config() : ['enabled' => true, 'number_clean' => '923001234567', 'number_raw' => '+92 300 1234567', 'default_msg' => 'Hi ChargeHub, I have a question about your products.'];
+    if (!empty($waHomeConfig['enabled'])): 
+    ?>
     <div class="fixed bottom-6 right-6 z-50 flex items-center space-x-3">
         <!-- Floating Tooltip Preview -->
         <div id="wa-tooltip" class="hidden sm:flex items-center px-3.5 py-1.5 rounded-full bg-white text-gray-800 text-xs font-semibold shadow-xl border border-gray-100 transition-opacity">
@@ -1197,9 +1201,9 @@ if (empty($categories)) {
         </div>
 
         <!-- WhatsApp Floating Icon -->
-        <a href="https://wa.me/923001234567" target="_blank" rel="noopener noreferrer" 
+        <a href="https://wa.me/<?= e($waHomeConfig['number_clean']) ?>?text=<?= urlencode($waHomeConfig['default_msg']) ?>" target="_blank" rel="noopener noreferrer" 
            class="relative w-14 h-14 rounded-full bg-[#25d366] text-white flex items-center justify-center shadow-[0_8px_25px_rgba(37,211,102,0.45)] hover:scale-110 active:scale-95 transition-all group"
-           title="WhatsApp Live Chat Support">
+           title="WhatsApp Live Chat Support: <?= e($waHomeConfig['number_raw']) ?>">
             <div class="whatsapp-ripple pointer-events-none"></div>
             <!-- WhatsApp Handset SVG -->
             <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
@@ -1207,6 +1211,7 @@ if (empty($categories)) {
             </svg>
         </a>
     </div>
+    <?php endif; ?>
 
     <!-- ================================================================= -->
     <!-- GLOBAL FOOTER -->
@@ -1252,7 +1257,7 @@ if (empty($categories)) {
                 <div>
                     <h4 class="font-bold text-white text-xs tracking-wider uppercase mb-3">Customer Support</h4>
                     <ul class="space-y-2 text-xs text-gray-400">
-                        <li>WhatsApp: +92 300 1234567</li>
+                        <li>WhatsApp: <a href="https://wa.me/<?= e($waHomeConfig['number_clean']) ?>" target="_blank" class="hover:text-emerald-400 transition-colors"><?= e($waHomeConfig['number_raw']) ?></a></li>
                         <li>Email: support@chargehub.pk</li>
                         <li>7-Day Easy Replacement Policy</li>
                         <li>1-Year Official Warranty</li>

@@ -17,6 +17,15 @@
 
     <!-- Right: Theme Toggle, DB Status & Action Buttons -->
     <div class="flex items-center space-x-2.5">
+        <!-- WhatsApp Status Pill -->
+        <?php $topWa = function_exists('get_whatsapp_config') ? get_whatsapp_config() : null; ?>
+        <?php if ($topWa): ?>
+        <a href="index.php#dashboard_whatsapp_number" class="hidden xl:inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold <?= $topWa['enabled'] ? 'bg-[#25D366]/15 text-[#25D366] border-[#25D366]/30 hover:bg-[#25D366]/25' : 'bg-slate-500/10 text-app-muted border-app hover:bg-slate-500/20' ?> border transition-colors" title="Click to edit WhatsApp support number on Dashboard">
+            <span>💬</span>
+            <span><?= $topWa['enabled'] ? e($topWa['number_raw']) : 'WhatsApp Disabled' ?></span>
+        </a>
+        <?php endif; ?>
+
         <!-- MySQL Status Badge -->
         <span class="hidden lg:inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>

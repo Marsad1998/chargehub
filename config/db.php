@@ -294,6 +294,25 @@ function init_chargehub_database(PDO $pdo) {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
+    // 10. Site Settings Table (Store & WhatsApp Configuration)
+    $pdo->exec("CREATE TABLE IF NOT EXISTS site_settings (
+        setting_key VARCHAR(100) PRIMARY KEY,
+        setting_value TEXT,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    // Seed default WhatsApp settings if none exist
+    try {
+        $stmtWaS = $pdo->prepare("SELECT COUNT(*) FROM site_settings WHERE setting_key = 'whatsapp_number'");
+        $stmtWaS->execute();
+        if ($stmtWaS->fetchColumn() == 0) {
+            $insSetting = $pdo->prepare("INSERT INTO site_settings (setting_key, setting_value) VALUES (?, ?)");
+            $insSetting->execute(['whatsapp_number', '+92 300 1234567']);
+            $insSetting->execute(['whatsapp_enabled', '1']);
+            $insSetting->execute(['whatsapp_default_msg', 'Hi ChargeHub, I have a question about your products.']);
+        }
+    } catch (Exception $e) {}
+
     // Seed default admin if none exists
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM admins");
     $stmt->execute();
@@ -956,4 +975,71 @@ function render_mysql_error_screen(array $errors) {
     </body>
     </html>
     <?php
+}
+
+/**
+ * Site Settings & WhatsApp Configuration Helpers
+ */
+if (!function_exists('get_site_setting')) {
+    function get_site_setting($key, $default = '') {
+        global $pdo;
+        if (!$pdo) return $default;
+        try {
+            $stmt = $pdo->prepare("SELECT setting_value FROM site_settings WHERE setting_key = ? LIMIT 1");
+            $stmt->execute([$key]);
+            $val = $stmt->fetchColumn();
+            return ($val !== false && $val !== null) ? $val : $default;
+        } catch (Exception $e) {
+            return $default;
+        }
+    }
+}
+
+if (!function_exists('set_site_setting')) {
+    function set_site_setting($key, $value) {
+        global $pdo;
+        if (!$pdo) return false;
+        try {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS site_settings (
+                setting_key VARCHAR(100) PRIMARY KEY,
+                setting_value TEXT,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+            $stmt = $pdo->prepare("INSERT INTO site_settings (setting_key, setting_value) VALUES (?, ?) 
+                ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_at = NOW()");
+            return $stmt->execute([$key, $value]);
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+}
+
+if (!function_exists('clean_whatsapp_number')) {
+    function clean_whatsapp_number($phone) {
+        $cleaned = preg_replace('/[^0-9]/', '', (string)$phone);
+        if (str_starts_with($cleaned, '03') && strlen($cleaned) === 11) {
+            $cleaned = '92' . substr($cleaned, 1);
+        } elseif (str_starts_with($cleaned, '0092')) {
+            $cleaned = substr($cleaned, 2);
+        } elseif (!str_starts_with($cleaned, '92') && strlen($cleaned) === 10 && str_starts_with($cleaned, '3')) {
+            $cleaned = '92' . $cleaned;
+        }
+        return $cleaned ?: '923001234567';
+    }
+}
+
+if (!function_exists('get_whatsapp_config')) {
+    function get_whatsapp_config() {
+        $rawNumber = get_site_setting('whatsapp_number', '+92 300 1234567');
+        $enabled = (int)get_site_setting('whatsapp_enabled', '1');
+        $defaultMsg = get_site_setting('whatsapp_default_msg', 'Hi ChargeHub, I have a question about your products.');
+        
+        return [
+            'number_raw' => $rawNumber ?: '+92 300 1234567',
+            'number_clean' => clean_whatsapp_number($rawNumber),
+            'enabled' => $enabled === 1,
+            'default_msg' => $defaultMsg ?: 'Hi ChargeHub, I have a question about your products.',
+        ];
+    }
 }

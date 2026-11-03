@@ -612,7 +612,7 @@ $csrf_token = generate_csrf_token();
             .replace(/{total_amount}/g, '6,900')
             .replace(/{order_items_html}/g, sampleItems)
             .replace(/{order_date}/g, '<?= date("M d, Y h:i A") ?>')
-            .replace(/{whatsapp_link}/g, 'https://wa.me/923001234567')
+            .replace(/{whatsapp_link}/g, 'https://wa.me/<?= e(function_exists("get_whatsapp_config") ? get_whatsapp_config()["number_clean"] : "923001234567") ?>')
             .replace(/{site_name}/g, 'ChargeHub.pk');
 
         const frame = document.getElementById('preview-frame');

@@ -2,6 +2,34 @@
 $page_title = 'Dashboard Overview';
 require_once __DIR__ . '/includes/header.php';
 
+// Handle WhatsApp Setup Submission from Dashboard
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_whatsapp') {
+    $token = $_POST['csrf_token'] ?? '';
+    if (!validate_csrf_token($token)) {
+        set_flash_message('error', 'Security token invalid or expired. Please refresh and try again.');
+    } else {
+        $wa_number = trim($_POST['whatsapp_number'] ?? '');
+        $wa_enabled = isset($_POST['whatsapp_enabled']) ? '1' : '0';
+        $wa_msg = trim($_POST['whatsapp_default_msg'] ?? '');
+
+        if (empty($wa_number)) {
+            set_flash_message('error', 'WhatsApp phone number cannot be empty.');
+        } else {
+            set_site_setting('whatsapp_number', $wa_number);
+            set_site_setting('whatsapp_enabled', $wa_enabled);
+            set_site_setting('whatsapp_default_msg', $wa_msg);
+            $cleanNum = clean_whatsapp_number($wa_number);
+            $statusText = ($wa_enabled === '1') ? 'active & visible on storefront' : 'saved (currently disabled)';
+            set_flash_message('success', "WhatsApp settings updated! Helpline number is {$wa_number} (wa.me/{$cleanNum}), status: {$statusText}.");
+        }
+    }
+    header('Location: index.php');
+    exit;
+}
+
+$waConfig = get_whatsapp_config();
+$flashMessages = get_flash_messages();
+
 // Fetch metrics using prepared statements
 $prodCount = (int)$pdo->query("SELECT COUNT(*) FROM products")->fetchColumn();
 $activeProdCount = (int)$pdo->query("SELECT COUNT(*) FROM products WHERE is_active = 1")->fetchColumn();
@@ -84,6 +112,16 @@ $recentProducts = $stmtRecent->fetchAll();
             </div>
         </div>
 
+        <!-- FLASH NOTIFICATIONS -->
+        <?php foreach ($flashMessages as $msg): ?>
+        <div class="flash-alert p-3.5 rounded-xl <?= $msg['type'] === 'success' ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-500' : 'bg-red-500/15 border-red-500/30 text-red-500' ?> border text-xs font-semibold flex items-center justify-between shadow-sm">
+            <div class="flex items-center space-x-2">
+                <span><?= $msg['type'] === 'success' ? '✓' : '⚠️' ?></span>
+                <span><?= e($msg['text']) ?></span>
+            </div>
+            <button onclick="this.parentElement.remove()" class="opacity-60 hover:opacity-100 cursor-pointer text-sm">&times;</button>
+        </div>
+        <?php endforeach; ?>
 
         <!-- METRICS TILES (Concise 5-Column Grid) -->
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
@@ -136,6 +174,99 @@ $recentProducts = $stmtRecent->fetchAll();
                 <div class="text-xl font-black text-app-title"><?= $heroCount ?> Hero <span class="text-[11px] font-normal text-app-muted">+ <?= $spotCount ?> Spot</span></div>
                 <div class="text-[10px] text-blue-500 font-semibold mt-1">Control Visuals &rarr;</div>
             </a>
+        </div>
+
+        <!-- WHATSAPP FLOATING BUTTON & SUPPORT SETUP CARD -->
+        <div class="rounded-2xl bg-app-card border border-app p-5 shadow-sm space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-app">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-[#25D366]/15 text-[#25D366] flex items-center justify-center text-xl shrink-0 border border-[#25D366]/30 shadow-sm">
+                        💬
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h3 class="text-sm font-black text-app-title brand-font uppercase tracking-wider">
+                                WhatsApp Button &amp; Helpline Setup
+                            </h3>
+                            <?php if ($waConfig['enabled']): ?>
+                            <span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>Active on Store</span>
+                            </span>
+                            <?php else: ?>
+                            <span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-500/15 text-app-muted border border-app">
+                                <span>○ Disabled</span>
+                            </span>
+                            <?php endif; ?>
+                        </div>
+                        <p class="text-xs text-app-muted mt-0.5">
+                            Configure the customer WhatsApp helpline number for floating chat buttons, quick orders, and order confirmation links.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-2 shrink-0">
+                    <a href="https://wa.me/<?= e($waConfig['number_clean']) ?>?text=<?= urlencode($waConfig['default_msg']) ?>" target="_blank" rel="noopener noreferrer" class="px-3.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-600 font-bold text-xs flex items-center space-x-1.5 border border-emerald-500/30 transition-colors shadow-sm cursor-pointer" title="Test this WhatsApp link in a new tab">
+                        <span>📱 Test Link</span>
+                        <span>↗</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- WhatsApp Configuration Form -->
+            <form method="POST" action="index.php" class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
+                <input type="hidden" name="action" value="save_whatsapp">
+
+                <!-- WhatsApp Mobile Number Input -->
+                <div class="md:col-span-4 space-y-1">
+                    <label class="block text-xs font-bold text-app-title flex items-center justify-between">
+                        <span>WhatsApp Mobile Number <span class="text-red-500">*</span></span>
+                        <span class="text-[10.5px] text-app-muted font-normal">Current: <code class="font-mono text-emerald-500 font-bold"><?= e($waConfig['number_raw']) ?></code></span>
+                    </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-xs text-app-muted">🇵🇰</span>
+                        <input type="text" 
+                               name="whatsapp_number" 
+                               id="dashboard_whatsapp_number" 
+                               value="<?= e($waConfig['number_raw']) ?>" 
+                               required 
+                               placeholder="e.g. +92 300 1234567 or 03001234567" 
+                               oninput="updateDashboardWaPreview()" 
+                               class="w-full pl-9 pr-3 py-2 rounded-xl input-app border border-app text-xs font-semibold text-app-title placeholder:text-app-muted focus:outline-none focus:border-emerald-500 transition-all font-mono">
+                    </div>
+                    <p class="text-[10px] text-app-muted">Format: 03xx or +92. Converts to standard <code class="text-app-title font-mono font-semibold">wa.me/<?= e($waConfig['number_clean']) ?></code></p>
+                </div>
+
+                <!-- Default Customer Message -->
+                <div class="md:col-span-5 space-y-1">
+                    <label class="block text-xs font-bold text-app-title">
+                        Default Pre-filled Message (Optional)
+                    </label>
+                    <input type="text" 
+                           name="whatsapp_default_msg" 
+                           id="dashboard_whatsapp_msg" 
+                           value="<?= e($waConfig['default_msg']) ?>" 
+                           placeholder="e.g. Hi ChargeHub, I have a question about your products." 
+                           oninput="updateDashboardWaPreview()" 
+                           class="w-full px-3 py-2 rounded-xl input-app border border-app text-xs text-app-title placeholder:text-app-muted focus:outline-none focus:border-emerald-500 transition-all">
+                    <p class="text-[10px] text-app-muted truncate" id="dashboard_wa_preview_link">
+                        Live link: <a href="https://wa.me/<?= e($waConfig['number_clean']) ?>?text=<?= urlencode($waConfig['default_msg']) ?>" target="_blank" class="text-blue-500 hover:underline font-mono">https://wa.me/<?= e($waConfig['number_clean']) ?></a>
+                    </p>
+                </div>
+
+                <!-- Toggle & Submit Button -->
+                <div class="md:col-span-3 flex flex-col justify-end space-y-2">
+                    <label class="flex items-center space-x-2 cursor-pointer select-none">
+                        <input type="checkbox" name="whatsapp_enabled" value="1" <?= $waConfig['enabled'] ? 'checked' : '' ?> class="rounded text-emerald-600 focus:ring-emerald-500">
+                        <span class="text-xs font-bold text-app-title">Enable floating button</span>
+                    </label>
+                    <button type="submit" class="w-full py-2 px-4 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-xs shadow-md transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95">
+                        <span>💾</span>
+                        <span>Save WhatsApp Number</span>
+                    </button>
+                </div>
+            </form>
         </div>
 
         <!-- RECENT CUSTOMER ORDERS TABLE -->
@@ -355,5 +486,28 @@ $recentProducts = $stmtRecent->fetchAll();
     </main>
 
 </div>
+
+<script>
+function updateDashboardWaPreview() {
+    const numInput = document.getElementById('dashboard_whatsapp_number');
+    const msgInput = document.getElementById('dashboard_whatsapp_msg');
+    const previewEl = document.getElementById('dashboard_wa_preview_link');
+    if (!numInput || !previewEl) return;
+    
+    let raw = (numInput.value || '').replace(/[^0-9]/g, '');
+    if (raw.startsWith('03') && raw.length === 11) {
+        raw = '92' + raw.substring(1);
+    } else if (raw.startsWith('0092')) {
+        raw = raw.substring(2);
+    } else if (!raw.startsWith('92') && raw.length === 10 && raw.startsWith('3')) {
+        raw = '92' + raw;
+    }
+    
+    const clean = raw || '923001234567';
+    const msg = encodeURIComponent(msgInput ? msgInput.value.trim() : '');
+    const url = `https://wa.me/${clean}` + (msg ? `?text=${msg}` : '');
+    previewEl.innerHTML = `Live link: <a href="${url}" target="_blank" class="text-blue-500 hover:underline font-mono">${url}</a>`;
+}
+</script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
