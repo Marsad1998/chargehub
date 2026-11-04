@@ -1,5 +1,10 @@
 <?php
-require_once __DIR__ . '/includes/header.php';
+if (!ob_get_level()) {
+    ob_start();
+}
+require_once __DIR__ . '/../../config/db.php';
+require_once __DIR__ . '/../../includes/auth.php';
+require_admin_login();
 
 $id = (int)($_GET['id'] ?? 0);
 $is_edit = ($id > 0);
@@ -48,12 +53,13 @@ if ($is_edit) {
         $product = $existing;
     } else {
         set_flash_message('error', 'Product not found.');
+        if (ob_get_level()) ob_end_clean();
         header('Location: products.php');
         exit;
     }
 }
 
-// Handle Form Submission
+// Handle Form Submission (POST) BEFORE including HTML header
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
         $error = 'Security token invalid or expired. Please refresh.';
@@ -196,11 +202,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 set_flash_message('success', 'Product "' . $name . '" created successfully!');
             }
 
-            header('Location: products.php');
-            exit;
+            if (ob_get_level()) {
+                ob_end_clean();
+            }
+            if (!headers_sent()) {
+                header('Location: products.php');
+                exit;
+            } else {
+                echo '<script>window.location.href="products.php";</script>';
+                echo '<noscript><meta http-equiv="refresh" content="0;url=products.php"></noscript>';
+                exit;
+            }
         }
+
+        // If error occurred, preserve input in form
+        $product['name'] = $name;
+        $product['slug'] = $slug;
+        $product['sku'] = $sku;
+        $product['category_id'] = $category_id;
+        $product['brand_id'] = $brand_id;
+        $product['badge_text'] = $badge_text;
+        $product['price'] = $price;
+        $product['original_price'] = $original_price;
+        $product['stock_status'] = $stock_status;
+        $product['stock_quantity'] = $stock_quantity;
+        $product['warranty_text'] = $warranty_text;
+        $product['rating'] = $rating;
+        $product['reviews_count'] = $reviews_count;
+        $product['orders_count'] = $orders_count;
+        $product['short_description'] = $short_description;
+        $product['full_description'] = $full_description;
+        $product['main_image'] = $main_image;
+        $product['is_featured'] = $is_featured;
+        $product['is_active'] = $is_active;
     }
 }
+
+// Include HTML layout header only now for rendering page
+require_once __DIR__ . '/includes/header.php';
 
 // Fetch categories and brands with icons/images for searchable selectors
 $categories = $pdo->query("SELECT id, name, slug, image_url FROM categories ORDER BY sort_order ASC, name ASC")->fetchAll();
