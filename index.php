@@ -1759,6 +1759,12 @@ if (empty($categories)) {
                 const dragTarget = carousel || container;
 
                 function onPointerDown(e) {
+                    // Ignore drag if user is clicking an interactive element (Buy Now button, link, etc.)
+                    if (e.target.closest('button, a, .add-cart-btn, input, label')) {
+                        isDragging = false;
+                        dragThresholdPassed = false;
+                        return;
+                    }
                     isDragging = true;
                     dragThresholdPassed = false;
                     currentDeltaX = 0;
@@ -1774,13 +1780,15 @@ if (empty($categories)) {
                     const deltaX = pt.clientX - startX;
                     const deltaY = pt.clientY - startY;
 
+                    // If user is scrolling vertically, cancel carousel drag immediately
                     if (e.touches && Math.abs(deltaY) > Math.abs(deltaX) && !dragThresholdPassed) {
                         isDragging = false;
+                        dragThresholdPassed = false;
                         setPosition(currentIndex, true);
                         return;
                     }
 
-                    if (Math.abs(deltaX) > 6) {
+                    if (Math.abs(deltaX) > 12) {
                         dragThresholdPassed = true;
                     }
 
@@ -1824,9 +1832,13 @@ if (empty($categories)) {
                 window.addEventListener('mousemove', onPointerMove);
                 window.addEventListener('mouseup', onPointerUp);
 
+                // Touch listeners scoped to dragTarget so page scrolling and browser pull-to-refresh are NEVER blocked
                 dragTarget.addEventListener('touchstart', onPointerDown, { passive: true });
-                window.addEventListener('touchmove', onPointerMove, { passive: false });
+                dragTarget.addEventListener('touchmove', onPointerMove, { passive: false });
+                dragTarget.addEventListener('touchend', onPointerUp, { passive: true });
+                dragTarget.addEventListener('touchcancel', onPointerUp, { passive: true });
                 window.addEventListener('touchend', onPointerUp, { passive: true });
+                window.addEventListener('touchcancel', onPointerUp, { passive: true });
 
                 // Initialize first position cleanly
                 setPosition(0, false);

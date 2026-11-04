@@ -29,9 +29,25 @@ require_once __DIR__ . '/mobile_sidebar.php';
                     <p class="text-[11px] text-gray-400">100% Genuine Gear &bull; Official Warranty</p>
                 </div>
             </div>
-            <button type="button" onclick="closeCartDrawer()" class="w-8 h-8 rounded-full bg-white hover:bg-gray-200 text-gray-500 hover:text-gray-900 flex items-center justify-center text-lg transition-colors border border-gray-200/60 shadow-sm cursor-pointer" title="Close cart">
-                &times;
-            </button>
+            
+            <div class="flex items-center space-x-1.5 sm:space-x-2">
+                <!-- Clear Cart / Empty Bag Button -->
+                <button type="button" 
+                        id="cart-clear-btn" 
+                        onclick="clearCart()" 
+                        class="text-[11px] font-bold text-gray-400 hover:text-red-600 transition-colors flex items-center space-x-1 px-2.5 py-1.5 rounded-lg hover:bg-red-50 border border-transparent hover:border-red-200 cursor-pointer" 
+                        title="Empty all items from your shopping bag">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    <span>Empty Bag</span>
+                </button>
+
+                <!-- Close Drawer Button -->
+                <button type="button" onclick="closeCartDrawer()" class="w-8 h-8 rounded-full bg-white hover:bg-gray-200 text-gray-500 hover:text-gray-900 flex items-center justify-center text-lg transition-colors border border-gray-200/60 shadow-sm cursor-pointer" title="Close cart">
+                    &times;
+                </button>
+            </div>
         </div>
 
         <!-- Free Shipping Tracker -->
@@ -54,9 +70,15 @@ require_once __DIR__ . '/mobile_sidebar.php';
             <p class="text-xs text-gray-400 max-w-xs mb-5 leading-relaxed">
                 Explore genuine GaN fast chargers, military-grade cables, and power stations.
             </p>
-            <a href="explore.php" onclick="closeCartDrawer()" class="px-6 py-2.5 rounded-full bg-brand-blue hover:bg-brand-blue-hover text-white text-xs font-bold transition-all shadow-md active:scale-95 inline-block">
-                Browse Catalog
-            </a>
+            <div class="flex items-center space-x-2.5">
+                <a href="explore.php" onclick="closeCartDrawer()" class="px-5 py-2.5 rounded-full bg-brand-blue hover:bg-brand-blue-hover text-white text-xs font-bold transition-all shadow-md active:scale-95 inline-block">
+                    Browse Catalog
+                </a>
+                <button type="button" onclick="window.location.reload()" class="px-4 py-2.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center space-x-1.5" title="Refresh current page">
+                    <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    <span>Reload Page</span>
+                </button>
+            </div>
         </div>
 
         <!-- Quick In-Drawer Checkout Form -->
@@ -150,6 +172,17 @@ require_once __DIR__ . '/mobile_sidebar.php';
                 </a>
             </div>
 
+            <!-- Quick Footer Links: Empty Bag & Continue Shopping -->
+            <div class="flex items-center justify-between text-[11px] pt-1 px-1">
+                <button type="button" onclick="clearCart()" class="text-gray-400 hover:text-red-500 font-semibold flex items-center space-x-1 cursor-pointer transition-colors" title="Empty all items from bag">
+                    <svg class="w-3 h-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    <span>Empty Entire Bag</span>
+                </button>
+                <button type="button" onclick="closeCartDrawer()" class="text-brand-blue hover:underline font-semibold cursor-pointer">
+                    Continue Shopping &rarr;
+                </button>
+            </div>
+
             <div class="text-[10px] text-gray-400 text-center flex items-center justify-center space-x-1 pt-0.5">
                 <span>🔒 Official 18-Month Direct Swap Replacement Guarantee</span>
             </div>
@@ -183,13 +216,17 @@ require_once __DIR__ . '/mobile_sidebar.php';
 
     function addToCart(product, qty = 1, openSidebar = true) {
         const cart = getCart();
-        const existingIndex = cart.findIndex(item => (product.id && item.id == product.id) || (product.slug && item.slug && item.slug == product.slug));
+        const existingIndex = cart.findIndex(item => 
+            (product.id && String(item.id) === String(product.id)) || 
+            (product.slug && item.slug && item.slug === product.slug) ||
+            (product.name && item.name && item.name === product.name)
+        );
         
         if (existingIndex > -1) {
             cart[existingIndex].qty += parseInt(qty) || 1;
         } else {
             cart.push({
-                id: product.id || ('p-' + Math.floor(Math.random() * 90000)),
+                id: product.id ? String(product.id) : ('p-' + Math.floor(Math.random() * 90000)),
                 name: product.name || 'Product',
                 slug: product.slug || '',
                 price: parseFloat(product.price) || 0,
@@ -208,9 +245,9 @@ require_once __DIR__ . '/mobile_sidebar.php';
 
     function updateCartItemQty(id, delta) {
         let cart = getCart();
-        const idx = cart.findIndex(item => item.id == id);
+        const idx = cart.findIndex(item => String(item.id) === String(id));
         if (idx > -1) {
-            cart[idx].qty += delta;
+            cart[idx].qty = (parseInt(cart[idx].qty) || 1) + delta;
             if (cart[idx].qty <= 0) {
                 cart.splice(idx, 1);
             }
@@ -219,17 +256,13 @@ require_once __DIR__ . '/mobile_sidebar.php';
     }
 
     function removeCartItem(id) {
-        let cart = getCart().filter(item => item.id != id);
+        let cart = getCart().filter(item => String(item.id) !== String(id));
         saveCart(cart);
     }
 
     function clearCart() {
         localStorage.removeItem(CART_KEY);
-        renderCart();
-        updateCartCounterBadges();
-        if (typeof renderCheckoutSummary === 'function') {
-            renderCheckoutSummary();
-        }
+        saveCart([]);
     }
 
     function updateCartCounterBadges() {
@@ -251,6 +284,7 @@ require_once __DIR__ . '/mobile_sidebar.php';
         const itemsContainer = document.getElementById('cart-items-container');
         const emptyState = document.getElementById('cart-empty-state');
         const footerSection = document.getElementById('cart-footer-section');
+        const clearBtn = document.getElementById('cart-clear-btn');
         const subtotalEl = document.getElementById('cart-subtotal');
         const totalEl = document.getElementById('cart-total');
         const btnTotalEl = document.getElementById('checkout-btn-total');
@@ -265,6 +299,7 @@ require_once __DIR__ . '/mobile_sidebar.php';
             itemsContainer.classList.add('hidden');
             if (emptyState) emptyState.classList.remove('hidden');
             if (footerSection) footerSection.classList.add('hidden');
+            if (clearBtn) clearBtn.classList.add('hidden');
             toggleCheckoutForm(false);
             return;
         }
@@ -272,6 +307,7 @@ require_once __DIR__ . '/mobile_sidebar.php';
         itemsContainer.classList.remove('hidden');
         if (emptyState) emptyState.classList.add('hidden');
         if (footerSection) footerSection.classList.remove('hidden');
+        if (clearBtn) clearBtn.classList.remove('hidden');
 
         let html = '';
         let waItemsList = [];
@@ -282,29 +318,31 @@ require_once __DIR__ . '/mobile_sidebar.php';
             waItemsList.push(`• ${item.name} (Qty: ${item.qty}) - Rs. ${itemTotal.toLocaleString()}`);
 
             const productLink = item.slug ? `product-detail.php?slug=${encodeURIComponent(item.slug)}` : 'explore.php';
+            const safeName = String(item.name || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            const safeId = String(item.id).replace(/'/g, "\\'");
 
             html += `
                 <div class="flex items-center space-x-3 pt-3 first:pt-0">
                     <a href="${productLink}" class="shrink-0 w-16 h-16 rounded-xl bg-slate-50 border border-slate-200/80 p-1 flex items-center justify-center overflow-hidden hover:opacity-90 transition-opacity">
-                        <img src="${item.main_image}" alt="${item.name}" class="w-full h-full object-contain" onerror="this.src='images/Hero Banner.jpg'">
+                        <img src="${item.main_image}" alt="${safeName}" class="w-full h-full object-contain" onerror="this.src='images/Hero Banner.jpg'">
                     </a>
                     <div class="flex-1 min-w-0">
-                        <a href="${productLink}" class="block font-bold text-xs text-gray-900 hover:text-brand-blue transition-colors line-clamp-1" title="${item.name}">
-                            ${item.name}
+                        <a href="${productLink}" class="block font-bold text-xs text-gray-900 hover:text-brand-blue transition-colors line-clamp-1" title="${safeName}">
+                            ${safeName}
                         </a>
                         <div class="text-[11px] text-gray-500 mt-0.5">
                             Rs. ${Number(item.price).toLocaleString()}
                         </div>
                         <div class="flex items-center justify-between mt-2">
                             <div class="flex items-center border border-gray-200 rounded-lg bg-slate-50 overflow-hidden h-7">
-                                <button type="button" onclick="updateCartItemQty('${item.id}', -1)" class="w-6 h-full flex items-center justify-center text-gray-600 hover:bg-gray-200 font-bold transition-colors cursor-pointer text-xs">−</button>
+                                <button type="button" onclick="updateCartItemQty('${safeId}', -1)" class="w-6 h-full flex items-center justify-center text-gray-600 hover:bg-gray-200 font-bold transition-colors cursor-pointer text-xs">−</button>
                                 <span class="w-7 text-center text-xs font-black text-gray-900">${item.qty}</span>
-                                <button type="button" onclick="updateCartItemQty('${item.id}', 1)" class="w-6 h-full flex items-center justify-center text-gray-600 hover:bg-gray-200 font-bold transition-colors cursor-pointer text-xs">+</button>
+                                <button type="button" onclick="updateCartItemQty('${safeId}', 1)" class="w-6 h-full flex items-center justify-center text-gray-600 hover:bg-gray-200 font-bold transition-colors cursor-pointer text-xs">+</button>
                             </div>
                             <div class="flex items-center space-x-2">
                                 <span class="font-black text-xs text-gray-950">Rs. ${Number(itemTotal).toLocaleString()}</span>
-                                <button type="button" onclick="removeCartItem('${item.id}')" class="text-gray-400 hover:text-red-500 transition-colors p-1 text-sm cursor-pointer" title="Remove item">
-                                    &times;
+                                <button type="button" onclick="removeCartItem('${safeId}')" class="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer text-sm" title="Remove item from bag">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                 </button>
                             </div>
                         </div>
@@ -347,6 +385,7 @@ require_once __DIR__ . '/mobile_sidebar.php';
             wrapper.classList.remove('opacity-100', 'pointer-events-auto');
             wrapper.classList.add('opacity-0', 'pointer-events-none');
         }
+        document.body.style.overflow = '';
     }
 
     function toggleCheckoutForm(show) {
@@ -528,4 +567,16 @@ require_once __DIR__ . '/mobile_sidebar.php';
             }
         });
     });
+
+    // Explicitly bind cart management actions to global window scope
+    window.getCart = getCart;
+    window.saveCart = saveCart;
+    window.addToCart = addToCart;
+    window.clearCart = clearCart;
+    window.removeCartItem = removeCartItem;
+    window.updateCartItemQty = updateCartItemQty;
+    window.openCartDrawer = openCartDrawer;
+    window.closeCartDrawer = closeCartDrawer;
+    window.toggleCheckoutForm = toggleCheckoutForm;
+    window.resetOrderSuccess = resetOrderSuccess;
 </script>
