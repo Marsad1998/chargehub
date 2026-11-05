@@ -1,7 +1,6 @@
 <?php
-if (!ob_get_level()) {
-    ob_start();
-}
+// Always start an unlimited output buffer to prevent 4KB chunk overflows
+ob_start();
 require_once __DIR__ . '/../../config/db.php';
 require_once __DIR__ . '/../../includes/auth.php';
 require_admin_login();
@@ -10,8 +9,7 @@ require_admin_login();
 $request_path = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
 if (!empty($request_path) && substr($request_path, -1) !== '/' && !str_ends_with($request_path, '.php')) {
     $queryString = !empty($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '';
-    header('Location: ' . $request_path . '/' . $queryString, true, 301);
-    exit;
+    admin_redirect($request_path . '/' . $queryString);
 }
 
 $current_page = basename($_SERVER['PHP_SELF'] ?? 'index.php');

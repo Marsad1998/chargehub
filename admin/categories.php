@@ -1,14 +1,17 @@
 <?php
-$page_title = 'Categories Management';
-require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_admin_login();
 
 $error = '';
 $success = '';
 
-// Handle Actions (POST)
+// Handle Actions (POST) BEFORE including HTML layout
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
         $error = 'Security token invalid or expired. Please refresh.';
+        set_flash_message('error', $error);
+        admin_redirect('categories.php');
     } else {
         $action = $_POST['action'] ?? '';
 
@@ -49,8 +52,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("INSERT INTO categories (name, slug, image_url, badge_text, models_count_text, bg_color, description, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$name, $slug, $image_url, $badge_text, $models_count_text, $bg_color, $description, $sort_order, $is_active]);
                 set_flash_message('success', 'Category "' . $name . '" created successfully!');
-                header('Location: categories.php');
-                exit;
+                admin_redirect('categories.php');
+            } else {
+                set_flash_message('error', $error);
+                admin_redirect('categories.php');
             }
         }
 
@@ -96,8 +101,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("UPDATE categories SET name = ?, slug = ?, image_url = ?, badge_text = ?, models_count_text = ?, bg_color = ?, description = ?, sort_order = ?, is_active = ? WHERE id = ?");
                 $stmt->execute([$name, $slug, $image_url, $badge_text, $models_count_text, $bg_color, $description, $sort_order, $is_active, $id]);
                 set_flash_message('success', 'Category updated successfully!');
-                header('Location: categories.php');
-                exit;
+                admin_redirect('categories.php');
+            } else {
+                set_flash_message('error', $error ?: 'Unable to update category.');
+                admin_redirect('categories.php');
             }
         }
 
@@ -111,8 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("DELETE FROM categories WHERE id = ?");
                 $stmt->execute([$id]);
                 set_flash_message('success', 'Category deleted successfully!');
-                header('Location: categories.php');
-                exit;
+                admin_redirect('categories.php');
             }
         }
 
@@ -123,12 +129,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("UPDATE categories SET is_active = (CASE WHEN is_active = 1 THEN 0 ELSE 1 END) WHERE id = ?");
                 $stmt->execute([$id]);
                 set_flash_message('success', 'Category status updated.');
-                header('Location: categories.php');
-                exit;
+                admin_redirect('categories.php');
             }
         }
     }
 }
+
+$page_title = 'Categories Management';
+require_once __DIR__ . '/includes/header.php';
 
 // Count total categories for pagination
 $totalCats = (int)$pdo->query("SELECT COUNT(*) FROM categories")->fetchColumn();

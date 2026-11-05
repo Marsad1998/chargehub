@@ -2,9 +2,9 @@
 /**
  * ChargeHub.pk - Admin Email & SMTP Settings & Template Manager
  */
-
-$page_title = 'Email & SMTP Settings';
-require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_admin_login();
 require_once __DIR__ . '/../includes/mailer.php';
 
 $settings = get_email_settings();
@@ -13,13 +13,15 @@ $flash_success = '';
 $flash_error = '';
 $test_log = [];
 
-// Handle Form Submissions
+// Handle Form Submissions BEFORE including HTML layout
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST['csrf_token'] ?? '';
     $isValidToken = function_exists('validate_csrf_token') ? validate_csrf_token($token) : (function_exists('verify_csrf_token') ? verify_csrf_token($token) : true);
     
     if (!$isValidToken) {
         $flash_error = 'Session expired or invalid security token. Please try again.';
+        set_flash_message('error', $flash_error);
+        admin_redirect('settings-email.php');
     } else {
         $action = $_POST['action'] ?? '';
 
@@ -56,11 +58,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $settings['id']
                 ]);
 
-                $flash_success = 'SMTP settings saved successfully!';
-                $settings = get_email_settings();
+                set_flash_message('success', 'SMTP settings saved successfully!');
             } catch (Exception $e) {
-                $flash_error = 'Database error: ' . $e->getMessage();
+                set_flash_message('error', 'Database error: ' . $e->getMessage());
             }
+            admin_redirect('settings-email.php');
         }
 
         // 2. SAVE EMAIL TEMPLATE
@@ -69,19 +71,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email_template_html = trim($_POST['email_template_html'] ?? '');
 
             if (empty($email_subject)) {
-                $flash_error = 'Subject line cannot be empty.';
+                set_flash_message('error', 'Subject line cannot be empty.');
             } elseif (empty($email_template_html)) {
-                $flash_error = 'Template HTML cannot be empty.';
+                set_flash_message('error', 'Template HTML cannot be empty.');
             } else {
                 try {
                     $stmt = $pdo->prepare("UPDATE email_settings SET email_subject = ?, email_template_html = ? WHERE id = ?");
                     $stmt->execute([$email_subject, $email_template_html, $settings['id']]);
-                    $flash_success = 'Email template updated successfully!';
-                    $settings = get_email_settings();
+                    set_flash_message('success', 'Email template updated successfully!');
                 } catch (Exception $e) {
-                    $flash_error = 'Database error: ' . $e->getMessage();
+                    set_flash_message('error', 'Database error: ' . $e->getMessage());
                 }
             }
+            admin_redirect('settings-email.php');
         }
 
         // 3. RESET EMAIL TEMPLATE TO DEFAULT
@@ -91,20 +93,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $defaultSub = 'Order Confirmed #{order_number} - ChargeHub.pk';
                 $stmt = $pdo->prepare("UPDATE email_settings SET email_subject = ?, email_template_html = ? WHERE id = ?");
                 $stmt->execute([$defaultSub, $defaultTpl, $settings['id']]);
-                $flash_success = 'Email template reset to default responsive design!';
-                $settings = get_email_settings();
+                set_flash_message('success', 'Email template reset to default responsive design!');
             } catch (Exception $e) {
-                $flash_error = 'Error resetting template: ' . $e->getMessage();
+                set_flash_message('error', 'Error resetting template: ' . $e->getMessage());
             }
+            admin_redirect('settings-email.php');
         }
 
         // 4. TEST SMTP CONNECTION
         elseif ($action === 'test_email') {
             $test_to = trim($_POST['test_to'] ?? '');
             if (empty($test_to) || !filter_var($test_to, FILTER_VALIDATE_EMAIL)) {
-                $flash_error = 'Please enter a valid recipient email for the test.';
+                set_flash_message('error', 'Please enter a valid recipient email for the test.');
             } elseif (empty($settings['smtp_host'])) {
-                $flash_error = 'Please enter an SMTP Host first.';
+                set_flash_message('error', 'Please enter an SMTP Host first.');
             } else {
                 $smtp = new ChargeHubSMTP(
                     $settings['smtp_host'],
@@ -134,17 +136,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $settings['from_name']
                 );
 
-                $test_log = $smtp->debugLog;
+                $_SESSION['smtp_test_log'] = $smtp->debugLog;
 
                 if ($res['success']) {
-                    $flash_success = "Test email sent successfully to {$test_to}!";
+                    set_flash_message('success', "Test email sent successfully to {$test_to}!");
                 } else {
-                    $flash_error = "Test failed: " . ($res['error'] ?? 'Unknown socket error');
+                    set_flash_message('error', "Test failed: " . ($res['error'] ?? 'Unknown socket error'));
                 }
             }
+            admin_redirect('settings-email.php');
         }
     }
 }
+
+// Retrieve test debug log if present
+if (!empty($_SESSION['smtp_test_log'])) {
+    $test_log = $_SESSION['smtp_test_log'];
+    unset($_SESSION['smtp_test_log']);
+}
+
+// Consume flash messages
+foreach (get_flash_messages() as $fl) {
+    if ($fl['type'] === 'success') {
+        $flash_success = $fl['text'];
+    } elseif ($fl['type'] === 'error') {
+        $flash_error = $fl['text'];
+    }
+}
+
+$page_title = 'Email & SMTP Settings';
+require_once __DIR__ . '/includes/header.php';
 
 $csrf_token = generate_csrf_token();
 ?>

@@ -53,9 +53,7 @@ if ($is_edit) {
         $product = $existing;
     } else {
         set_flash_message('error', 'Product not found.');
-        if (ob_get_level()) ob_end_clean();
-        header('Location: products.php');
-        exit;
+        admin_redirect('products.php');
     }
 }
 
@@ -202,17 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 set_flash_message('success', 'Product "' . $name . '" created successfully!');
             }
 
-            if (ob_get_level()) {
-                ob_end_clean();
-            }
-            if (!headers_sent()) {
-                header('Location: products.php');
-                exit;
-            } else {
-                echo '<script>window.location.href="products.php";</script>';
-                echo '<noscript><meta http-equiv="refresh" content="0;url=products.php"></noscript>';
-                exit;
-            }
+            admin_redirect('products.php');
         }
 
         // If error occurred, preserve input in form

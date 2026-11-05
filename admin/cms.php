@@ -1,6 +1,7 @@
 <?php
-$page_title = 'CMS &bull; Media & Section Manager';
-require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_admin_login();
 
 $active_tab = $_GET['tab'] ?? 'hero';
 if (!in_array($active_tab, ['hero', 'spotlight', 'new_arrivals', 'flash_sale'])) {
@@ -435,6 +436,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$id]);
             $success_msg = 'Flash Sale deal status toggled!';
         }
+
+        if (!empty($success_msg)) {
+            set_flash_message('success', $success_msg);
+            admin_redirect('cms.php?tab=' . urlencode($active_tab));
+        } elseif (!empty($error_msg)) {
+            set_flash_message('error', $error_msg);
+            admin_redirect('cms.php?tab=' . urlencode($active_tab));
+        }
+    }
+}
+
+$page_title = 'CMS &bull; Media & Section Manager';
+require_once __DIR__ . '/includes/header.php';
+
+// Consume any session flash messages
+foreach (get_flash_messages() as $fl) {
+    if ($fl['type'] === 'success') {
+        $success_msg = $fl['text'];
+    } elseif ($fl['type'] === 'error') {
+        $error_msg = $fl['text'];
     }
 }
 

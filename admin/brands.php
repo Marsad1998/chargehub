@@ -1,14 +1,17 @@
 <?php
-$page_title = 'Brands Management';
-require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_admin_login();
 
 $error = '';
 $success = '';
 
-// Handle Actions (POST)
+// Handle Actions (POST) BEFORE including HTML layout
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
         $error = 'Security token invalid or expired. Please refresh.';
+        set_flash_message('error', $error);
+        admin_redirect('brands.php');
     } else {
         $action = $_POST['action'] ?? '';
 
@@ -46,8 +49,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("INSERT INTO brands (name, slug, logo_url, website, description, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$name, $slug, $logo_url, $website, $description, $sort_order, $is_active]);
                 set_flash_message('success', 'Brand "' . $name . '" created successfully!');
-                header('Location: brands.php');
-                exit;
+                admin_redirect('brands.php');
+            } else {
+                set_flash_message('error', $error);
+                admin_redirect('brands.php');
             }
         }
 
@@ -90,8 +95,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("UPDATE brands SET name = ?, slug = ?, logo_url = ?, website = ?, description = ?, sort_order = ?, is_active = ? WHERE id = ?");
                 $stmt->execute([$name, $slug, $logo_url, $website, $description, $sort_order, $is_active, $id]);
                 set_flash_message('success', 'Brand updated successfully!');
-                header('Location: brands.php');
-                exit;
+                admin_redirect('brands.php');
+            } else {
+                set_flash_message('error', $error ?: 'Unable to update brand.');
+                admin_redirect('brands.php');
             }
         }
 
@@ -103,8 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("DELETE FROM brands WHERE id = ?");
                 $stmt->execute([$id]);
                 set_flash_message('success', 'Brand deleted successfully!');
-                header('Location: brands.php');
-                exit;
+                admin_redirect('brands.php');
             }
         }
 
@@ -115,12 +121,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("UPDATE brands SET is_active = (CASE WHEN is_active = 1 THEN 0 ELSE 1 END) WHERE id = ?");
                 $stmt->execute([$id]);
                 set_flash_message('success', 'Brand status updated.');
-                header('Location: brands.php');
-                exit;
+                admin_redirect('brands.php');
             }
         }
     }
 }
+
+$page_title = 'Brands Management';
+require_once __DIR__ . '/includes/header.php';
 
 // Count total brands for pagination
 $totalBrands = (int)$pdo->query("SELECT COUNT(*) FROM brands")->fetchColumn();

@@ -1,8 +1,9 @@
 <?php
-$page_title = 'Dashboard Overview';
-require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_admin_login();
 
-// Handle WhatsApp Setup Submission from Dashboard
+// Handle WhatsApp Setup Submission from Dashboard (Before HTML layout is rendered)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_whatsapp') {
     $token = $_POST['csrf_token'] ?? '';
     if (!validate_csrf_token($token)) {
@@ -23,9 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
             set_flash_message('success', "WhatsApp settings updated! Helpline number is {$wa_number} (wa.me/{$cleanNum}), status: {$statusText}.");
         }
     }
-    header('Location: index.php');
-    exit;
+    admin_redirect('index.php');
 }
+
+$page_title = 'Dashboard Overview';
+require_once __DIR__ . '/includes/header.php';
 
 $waConfig = get_whatsapp_config();
 $flashMessages = get_flash_messages();

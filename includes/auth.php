@@ -150,3 +150,23 @@ function handle_image_upload($file, $target_dir, $prefix = 'img_') {
 
     return ['success' => false, 'error' => 'Failed to move uploaded file. Check folder permissions.'];
 }
+
+/**
+ * Safe redirect helper for admin actions.
+ * Cleans all active output buffers, sends Location header if headers have not yet been sent,
+ * or outputs fallback JS/meta redirect if headers were already sent.
+ */
+function admin_redirect($url) {
+    while (ob_get_level() > 0) {
+        @ob_end_clean();
+    }
+    if (!headers_sent()) {
+        header('Location: ' . $url);
+        exit;
+    }
+    echo '<!DOCTYPE html><html><head><meta charset="utf-8">';
+    echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '">';
+    echo '<script>window.location.replace(' . json_encode($url) . ');</script>';
+    echo '</head><body><p>Redirecting to <a href="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '</a>...</p></body></html>';
+    exit;
+}

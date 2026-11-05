@@ -1,14 +1,17 @@
 <?php
-$page_title = 'Products Catalog';
-require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_admin_login();
 
 $error = '';
 $success = '';
 
-// Handle Actions (POST)
+// Handle Actions (POST) BEFORE including HTML layout
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
         $error = 'Security token invalid or expired. Please refresh.';
+        set_flash_message('error', $error);
+        admin_redirect('products.php');
     } else {
         $action = $_POST['action'] ?? '';
 
@@ -19,8 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("DELETE FROM products WHERE id = ?");
                 $stmt->execute([$id]);
                 set_flash_message('success', 'Product deleted successfully.');
-                header('Location: products.php');
-                exit;
+                admin_redirect('products.php');
             }
         }
 
@@ -31,8 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("UPDATE products SET is_active = (CASE WHEN is_active = 1 THEN 0 ELSE 1 END) WHERE id = ?");
                 $stmt->execute([$id]);
                 set_flash_message('success', 'Product status updated.');
-                header('Location: products.php');
-                exit;
+                admin_redirect('products.php');
             }
         }
 
@@ -43,12 +44,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("UPDATE products SET is_featured = (CASE WHEN is_featured = 1 THEN 0 ELSE 1 END) WHERE id = ?");
                 $stmt->execute([$id]);
                 set_flash_message('success', 'Featured status updated.');
-                header('Location: products.php');
-                exit;
+                admin_redirect('products.php');
             }
         }
     }
 }
+
+$page_title = 'Products Catalog';
+require_once __DIR__ . '/includes/header.php';
 
 // Filters & Search
 $search = trim($_GET['search'] ?? '');

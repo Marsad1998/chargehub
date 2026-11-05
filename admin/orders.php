@@ -1,14 +1,17 @@
 <?php
-$page_title = 'Orders Management';
-require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_admin_login();
 
 $error = '';
 $success = '';
 
-// Handle Order Actions (POST)
+// Handle Order Actions (POST) BEFORE including HTML layout
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
         $error = 'Security token invalid or expired. Please refresh.';
+        set_flash_message('error', $error);
+        admin_redirect('orders.php');
     } else {
         $action = $_POST['action'] ?? '';
 
@@ -28,8 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt->execute([$new_status, $order_id]);
                 }
                 set_flash_message('success', "Order status successfully updated to '{$new_status}'.");
-                header('Location: orders.php' . (!empty($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : ''));
-                exit;
+                $redirectUrl = 'orders.php' . (!empty($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '');
+                admin_redirect($redirectUrl);
             }
         }
 
@@ -40,8 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("DELETE FROM orders WHERE id = ?");
                 $stmt->execute([$order_id]);
                 set_flash_message('success', 'Order record deleted successfully.');
-                header('Location: orders.php');
-                exit;
+                admin_redirect('orders.php');
             }
         }
 
@@ -57,8 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("UPDATE orders SET status = ? WHERE id IN ($placeholders)");
                 $stmt->execute($params);
                 set_flash_message('success', count($order_ids) . " orders updated to '{$bulk_status}'.");
-                header('Location: orders.php');
-                exit;
+                admin_redirect('orders.php');
             }
         }
 
@@ -73,12 +74,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } else {
                     set_flash_message('error', 'Failed to send email: ' . ($mRes['message'] ?? $mRes['error'] ?? 'Check SMTP settings in Email & SMTP Settings'));
                 }
-                header('Location: orders.php');
-                exit;
+                admin_redirect('orders.php');
             }
         }
     }
 }
+
+$page_title = 'Orders Management';
+require_once __DIR__ . '/includes/header.php';
 
 // Ensure orders table exists
 try {
