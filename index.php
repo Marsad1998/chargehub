@@ -412,39 +412,54 @@ if (empty($categories)) {
             transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Hero Carousel Slide-in Text Animation (Staggered Entrance) */
+        /* Hero Carousel Slide from Left Animation */
         .carousel-slide .slide-badge,
         .carousel-slide .slide-title,
         .carousel-slide .slide-subtitle,
         .carousel-slide .slide-btn {
             opacity: 0;
-            transform: translateY(32px);
+            transform: translateX(-45px);
             transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
             will-change: transform, opacity;
         }
 
         .carousel-slide.active .slide-badge {
             opacity: 1;
-            transform: translateY(0);
-            transition-delay: 0.1s;
+            transform: translateX(0);
+            transition-delay: 0.08s;
         }
 
         .carousel-slide.active .slide-title {
             opacity: 1;
-            transform: translateY(0);
-            transition-delay: 0.22s;
+            transform: translateX(0);
+            transition-delay: 0.18s;
         }
 
         .carousel-slide.active .slide-subtitle {
             opacity: 1;
-            transform: translateY(0);
-            transition-delay: 0.35s;
+            transform: translateX(0);
+            transition-delay: 0.32s;
         }
 
         .carousel-slide.active .slide-btn {
             opacity: 1;
-            transform: translateY(0);
-            transition-delay: 0.48s;
+            transform: translateX(0);
+            transition-delay: 0.45s;
+        }
+
+        /* Typewriter Cursor Effect */
+        .typewriter-cursor {
+            display: inline-block;
+            margin-left: 2px;
+            color: #ffffff;
+            font-weight: 200;
+            animation: typewriter-blink 0.75s infinite;
+            vertical-align: baseline;
+        }
+
+        @keyframes typewriter-blink {
+            0%, 45% { opacity: 1; }
+            50%, 100% { opacity: 0; }
         }
 
         /* Hide scrollbars */
@@ -642,8 +657,8 @@ if (empty($categories)) {
                             </div>
                             <?php endif; ?>
                             
-                            <h2 class="slide-title brand-font text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white uppercase tracking-tight leading-[1.08] drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)] max-w-2xl">
-                                <?= htmlspecialchars($slide['title'], ENT_QUOTES, 'UTF-8') ?>
+                            <h2 class="slide-title brand-font text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white uppercase tracking-tight leading-[1.08] drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)] max-w-2xl" data-title="<?= htmlspecialchars($slide['title'], ENT_QUOTES, 'UTF-8') ?>">
+                                <span class="typewriter-text"><?= htmlspecialchars($slide['title'], ENT_QUOTES, 'UTF-8') ?></span><span class="typewriter-cursor">|</span>
                             </h2>
                             
                             <?php if (!empty($slide['subtitle'])): ?>
@@ -1318,7 +1333,54 @@ if (empty($categories)) {
             
             let currentIndex = 0;
             let autoPlayTimer = null;
-            const slideInterval = 4500; // 4.5 seconds
+            let typingTimer = null;
+            const slideInterval = 5000; // 5 seconds for smooth typing & viewing
+
+            function runTypewriter(slideEl) {
+                if (!slideEl) return;
+                const titleEl = slideEl.querySelector('.slide-title');
+                if (!titleEl) return;
+
+                const textSpan = titleEl.querySelector('.typewriter-text');
+                const cursorSpan = titleEl.querySelector('.typewriter-cursor');
+                const fullText = titleEl.getAttribute('data-title') || (textSpan ? textSpan.textContent.trim() : '');
+                if (!textSpan || !fullText) return;
+
+                if (typingTimer) {
+                    clearInterval(typingTimer);
+                    typingTimer = null;
+                }
+
+                if (cursorSpan) {
+                    cursorSpan.style.opacity = '1';
+                    cursorSpan.style.display = 'inline-block';
+                }
+
+                textSpan.textContent = '';
+                let charIndex = 0;
+                const charDelay = Math.max(22, Math.min(40, Math.floor(1000 / fullText.length)));
+
+                // Delay typing slightly so the slide-in from the left begins first
+                setTimeout(() => {
+                    if (!slideEl.classList.contains('active')) return;
+
+                    typingTimer = setInterval(() => {
+                        if (charIndex < fullText.length) {
+                            textSpan.textContent += fullText.charAt(charIndex);
+                            charIndex++;
+                        } else {
+                            clearInterval(typingTimer);
+                            typingTimer = null;
+                            setTimeout(() => {
+                                if (cursorSpan && slideEl.classList.contains('active')) {
+                                    cursorSpan.style.transition = 'opacity 0.4s ease';
+                                    cursorSpan.style.opacity = '0';
+                                }
+                            }, 2200);
+                        }
+                    }, charDelay);
+                }, 160);
+            }
 
             function goToSlide(index) {
                 // Bounds check
@@ -1331,9 +1393,17 @@ if (empty($categories)) {
                     if (i === currentIndex) {
                         slide.classList.remove('opacity-0', 'pointer-events-none');
                         slide.classList.add('opacity-100', 'pointer-events-auto', 'active');
+                        runTypewriter(slide);
                     } else {
                         slide.classList.remove('opacity-100', 'pointer-events-auto', 'active');
                         slide.classList.add('opacity-0', 'pointer-events-none');
+                        const t = slide.querySelector('.slide-title');
+                        if (t) {
+                            const span = t.querySelector('.typewriter-text');
+                            const cur = t.querySelector('.typewriter-cursor');
+                            if (span && t.getAttribute('data-title')) span.textContent = t.getAttribute('data-title');
+                            if (cur) { cur.style.display = 'inline-block'; cur.style.opacity = '1'; }
+                        }
                     }
                 });
 
@@ -1423,9 +1493,11 @@ if (empty($categories)) {
                 }, { passive: true });
             }
 
-            // Initialize first slide and start auto-play
-            goToSlide(0);
-            startAutoPlay();
+            // Initialize first slide and start auto-play with slide-in & typewriter effect
+            setTimeout(() => {
+                goToSlide(0);
+                startAutoPlay();
+            }, 80);
 
             // --- MOBILE MENU TOGGLE ---
             const mobileMenuTrigger = document.getElementById('mobile-menu-trigger');
