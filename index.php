@@ -412,6 +412,41 @@ if (empty($categories)) {
             transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* Hero Carousel Slide-in Text Animation (Staggered Entrance) */
+        .carousel-slide .slide-badge,
+        .carousel-slide .slide-title,
+        .carousel-slide .slide-subtitle,
+        .carousel-slide .slide-btn {
+            opacity: 0;
+            transform: translateY(32px);
+            transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, opacity;
+        }
+
+        .carousel-slide.active .slide-badge {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.1s;
+        }
+
+        .carousel-slide.active .slide-title {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.22s;
+        }
+
+        .carousel-slide.active .slide-subtitle {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.35s;
+        }
+
+        .carousel-slide.active .slide-btn {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.48s;
+        }
+
         /* Hide scrollbars */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
@@ -594,51 +629,34 @@ if (empty($categories)) {
                     $navColor = !empty($slide['nav_color']) ? $slide['nav_color'] : '#0052cc';
                 ?>
                 <!-- DYNAMIC SLIDE <?= $index + 1 ?>: <?= htmlspecialchars($slide['title'], ENT_QUOTES, 'UTF-8') ?> -->
-                <div class="carousel-slide absolute inset-0 w-full h-full <?= $isActive ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none' ?> transition-opacity duration-700 ease-in-out" data-slide="<?= $index ?>" data-nav-color="<?= htmlspecialchars($navColor, ENT_QUOTES, 'UTF-8') ?>">
-                    <img src="<?= htmlspecialchars($slide['image_url'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($slide['title'], ENT_QUOTES, 'UTF-8') ?>" class="w-full h-full object-cover object-center">
-                    
-                    <?php if ($index > 0): ?>
-                    <div class="absolute inset-0 bg-gradient-to-r from-[#000814]/95 via-[#04122b]/80 to-transparent"></div>
-                    <div class="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/50 via-black/15 to-transparent pointer-events-none"></div>
-                    <?php endif; ?>
+                <div class="carousel-slide absolute inset-0 w-full h-full <?= $isActive ? 'opacity-100 pointer-events-auto active' : 'opacity-0 pointer-events-none' ?> transition-opacity duration-700 ease-in-out" data-slide="<?= $index ?>" data-nav-color="<?= htmlspecialchars($navColor, ENT_QUOTES, 'UTF-8') ?>">
+                    <!-- Real, authentic image without color effects or tint overlays -->
+                    <img src="<?= htmlspecialchars($slide['image_url'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($slide['title'], ENT_QUOTES, 'UTF-8') ?>" class="absolute inset-0 w-full h-full object-cover object-center z-0 pointer-events-none select-none">
 
-                    <!-- SLIDE CONTENT -->
-                    <div class="relative z-20 w-full h-full flex flex-col justify-center px-6 sm:px-12 md:px-16 lg:px-20 pt-12 pb-8 max-w-[860px]">
-                        <?php if (!empty($slide['badge_text'])): ?>
-                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full <?= $index === 0 ? 'bg-gradient-to-r from-brand-orange to-brand-gold text-white shadow-[0_2px_10px_rgba(255,85,0,0.35)]' : 'bg-blue-600/90 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]' ?> text-[10.5px] sm:text-[11px] font-extrabold tracking-widest uppercase mb-3 w-max">
-                            <span>⚡</span> <?= htmlspecialchars($slide['badge_text'], ENT_QUOTES, 'UTF-8') ?>
-                        </div>
-                        <?php endif; ?>
-                        
-                        <h2 class="brand-font text-[28px] sm:text-[40px] md:text-[50px] font-black <?= $index === 0 ? 'text-gray-950' : 'text-white drop-shadow-lg' ?> leading-[1.08] tracking-tight mb-3">
-                            <?= htmlspecialchars($slide['title'], ENT_QUOTES, 'UTF-8') ?>
-                        </h2>
-                        
-                        <?php if (!empty($slide['subtitle'])): ?>
-                        <p class="text-xs sm:text-sm md:text-base <?= $index === 0 ? 'text-gray-700' : 'text-blue-100/90' ?> font-medium mb-5 max-w-xl line-clamp-2 leading-relaxed">
-                            <?= htmlspecialchars($slide['subtitle'], ENT_QUOTES, 'UTF-8') ?>
-                        </p>
-                        <?php endif; ?>
+                    <!-- SLIDE CONTENT (Animated text matching reference) -->
+                    <div class="relative z-20 w-full h-full flex flex-col justify-center px-6 sm:px-12 md:px-16 lg:px-24 pt-14 sm:pt-16 lg:pt-12 pb-8 max-w-[840px] pointer-events-none">
+                        <div class="pointer-events-auto space-y-3 sm:space-y-4">
+                            <?php if (!empty($slide['badge_text'])): ?>
+                            <div class="slide-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/45 backdrop-blur-md border border-white/20 text-white text-[11px] sm:text-xs font-extrabold tracking-widest uppercase shadow-md w-max">
+                                <span>⚡</span> <?= htmlspecialchars($slide['badge_text'], ENT_QUOTES, 'UTF-8') ?>
+                            </div>
+                            <?php endif; ?>
+                            
+                            <h2 class="slide-title brand-font text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white uppercase tracking-tight leading-[1.08] drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)] max-w-2xl">
+                                <?= htmlspecialchars($slide['title'], ENT_QUOTES, 'UTF-8') ?>
+                            </h2>
+                            
+                            <?php if (!empty($slide['subtitle'])): ?>
+                            <p class="slide-subtitle text-xs sm:text-sm md:text-base lg:text-lg text-white/95 font-medium italic mb-2 max-w-xl line-clamp-3 leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
+                                <?= htmlspecialchars($slide['subtitle'], ENT_QUOTES, 'UTF-8') ?>
+                            </p>
+                            <?php endif; ?>
 
-                        <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 mb-6">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg <?= $index === 0 ? 'bg-white/80 border-gray-300 text-gray-900 shadow-sm' : 'bg-white/10 border-white/15 text-white' ?> backdrop-blur-md border text-[11px] font-semibold">
-                                ⚡ Ultra Fast Delivery
-                            </span>
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg <?= $index === 0 ? 'bg-white/80 border-gray-300 text-gray-900 shadow-sm' : 'bg-white/10 border-white/15 text-white' ?> backdrop-blur-md border text-[11px] font-semibold">
-                                🛡️ Multi-Tier Heat Shield
-                            </span>
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg <?= $index === 0 ? 'bg-white/80 border-gray-300 text-gray-900 shadow-sm' : 'bg-white/10 border-white/15 text-white' ?> backdrop-blur-md border text-[11px] font-semibold">
-                                🔋 100% Genuine Certified
-                            </span>
-                        </div>
-
-                        <div class="flex items-center space-x-3.5">
-                            <a href="<?= htmlspecialchars(!empty($slide['cta_link']) ? $slide['cta_link'] : 'explore.php', ENT_QUOTES, 'UTF-8') ?>" class="px-6 py-2.5 sm:py-3 rounded-full <?= $index === 0 ? 'bg-gradient-to-r from-brand-orange to-[#ff6b00] text-white shadow-orange-500/30 hover:shadow-orange-500/50' : 'bg-white text-gray-950 hover:bg-brand-gold' ?> font-bold text-xs sm:text-sm tracking-wide shadow-lg hover:brightness-110 transition-all transform hover:-translate-y-0.5">
-                                <?= htmlspecialchars(!empty($slide['cta_text']) ? $slide['cta_text'] : 'Explore Catalog', ENT_QUOTES, 'UTF-8') ?>
-                            </a>
-                            <a href="product-detail.php" class="px-5 py-2.5 sm:py-3 rounded-full <?= $index === 0 ? 'bg-white/85 text-gray-900 border-gray-300 hover:border-gray-400' : 'bg-white/15 text-white border-white/20 hover:bg-white/25' ?> hover:bg-white font-bold text-xs sm:text-sm backdrop-blur-md border shadow-sm transition-all">
-                                Product Details
-                            </a>
+                            <div class="slide-btn pt-1 sm:pt-2">
+                                <a href="<?= htmlspecialchars(!empty($slide['cta_link']) ? $slide['cta_link'] : 'explore.php', ENT_QUOTES, 'UTF-8') ?>" class="inline-flex items-center justify-center px-7 sm:px-9 py-3 sm:py-3.5 rounded-lg sm:rounded-xl bg-black/90 hover:bg-black text-white font-bold text-xs sm:text-sm tracking-wider uppercase border border-white/20 hover:border-white/50 transition-all shadow-xl hover:scale-105 active:scale-95">
+                                    <?= htmlspecialchars(!empty($slide['cta_text']) ? $slide['cta_text'] : 'Shop Now', ENT_QUOTES, 'UTF-8') ?>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1312,9 +1330,9 @@ if (empty($categories)) {
                 slides.forEach((slide, i) => {
                     if (i === currentIndex) {
                         slide.classList.remove('opacity-0', 'pointer-events-none');
-                        slide.classList.add('opacity-100', 'pointer-events-auto');
+                        slide.classList.add('opacity-100', 'pointer-events-auto', 'active');
                     } else {
-                        slide.classList.remove('opacity-100', 'pointer-events-auto');
+                        slide.classList.remove('opacity-100', 'pointer-events-auto', 'active');
                         slide.classList.add('opacity-0', 'pointer-events-none');
                     }
                 });
